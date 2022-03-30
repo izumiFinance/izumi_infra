@@ -1,0 +1,106 @@
+[
+  {
+    "model": "blockchain.blockchain",
+    "pk": 1,
+    "fields": {
+      "fullname": "Ethereum",
+      "symbol": "ETH",
+      "vm_type": "EVM",
+      "rpc_url": "https://mainnet.infura.io/v3/https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161",
+      "gas_price_wei": 5000000000,
+      "create_time": "2022-01-01T12:00:00",
+      "update_time": "2022-01-01T12:00:00"
+    }
+  },
+  {
+    "model": "blockchain.blockchain",
+    "pk": 10,
+    "fields": {
+      "fullname": "Optimistic Ethereum",
+      "symbol": "OETH",
+      "vm_type": "EVM",
+      "rpc_url": "https://mainnet.optimism.io/",
+      "gas_price_wei": 5000000000,
+      "create_time": "2022-01-01T12:00:00",
+      "update_time": "2021-01-01T12:00:00"
+    }
+  },
+  {
+    "model": "blockchain.blockchain",
+    "pk": 56,
+    "fields": {
+      "fullname": "Binance Smart Chain",
+      "symbol": "BSC",
+      "vm_type": "EVM",
+      "rpc_url": "https://bsc-dataseed1.binance.org:443",
+      "gas_price_wei": 5000000000,
+      "create_time": "2022-01-01T16:14:52.541",
+      "update_time": "2021-01-01T12:00:00"
+    }
+  },
+  {
+    "model": "blockchain.blockchain",
+    "pk": 69,
+    "fields": {
+      "fullname": "Optimistic Ethereum Testnet Kovan",
+      "symbol": "KOR",
+      "vm_type": "EVM",
+      "rpc_url": "https://kovan.optimism.io/",
+      "gas_price_wei": 5000000000,
+      "create_time": "2022-01-01T12:00:00",
+      "update_time": "2021-01-01T12:00:00"
+    }
+  },
+  {
+    "model": "blockchain.blockchain",
+    "pk": 97,
+    "fields": {
+      "fullname": "Binance Smart Chain Testnet",
+      "symbol": "BSCtest",
+      "vm_type": "EVM",
+      "rpc_url": "https://data-seed-prebsc-1-s1.binance.org:8545",
+      "gas_price_wei": 10000000000,
+      "create_time": "2022-01-21T12:00:00",
+      "update_time": "2021-01-01T12:00:00"
+    }
+  },
+  {
+    "model": "blockchain.blockchain",
+    "pk": 128,
+    "fields": {
+      "fullname": "Heco",
+      "symbol": "HECO",
+      "vm_type": "EVM",
+      "rpc_url": "https://http-mainnet-node.huobichain.com",
+      "gas_price_wei": 2500000000,
+      "create_time": "2022-01-11T17:38:07.806",
+      "update_time": "2021-01-01T12:00:00"
+    }
+  },
+  {
+    "model": "blockchain.blockchain",
+    "pk": 137,
+    "fields": {
+      "fullname": "Matic",
+      "symbol": "MATIC",
+      "vm_type": "EVM",
+      "rpc_url": "https://rpc-mainnet.maticvigil.com:443",
+      "gas_price_wei": 5000000000,
+      "create_time": "2022-01-01T16:15:25.247",
+      "update_time": "2021-01-01T12:00:00"
+    }
+  },
+  {
+    "model": "blockchain.blockchain",
+    "pk": 250,
+    "fields": {
+      "fullname": "Fantom",
+      "symbol": "FTM",
+      "vm_type": "EVM",
+      "rpc_url": "https://rpcapi.fantom.network",
+      "gas_price_wei": 50000000000,
+      "create_time": "2022-01-01T17:16:00.507",
+      "update_time": "2021-01-01T12:00:00"
+    }
+  }
+]

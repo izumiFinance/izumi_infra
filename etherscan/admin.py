@@ -1,0 +1,98 @@
+from datetime import datetime
+from typing import List
+from django.conf import settings
+from django.contrib import admin
+from izumi_infra.etherscan.constants import ProcessingStatusEnum, ScanTaskStatusEnum, ScanTypeEnum
+from izumi_infra.etherscan.facade.scanEventFacade import execute_unfinished_event_scan_task, scan_contract_event_by_config
+from izumi_infra.etherscan.facade.scanTransFacade import execute_unfinished_trans_scan_task, scan_contract_transactions_by_config
+
+from izumi_infra.etherscan.models import ContractEvent, ContractEventScanTask, ContractTransaction, ContractTransactionScanTask, EtherScanConfig
+
+# Register your models here.
+
+
+class EtherScanConfigAdmin(admin.ModelAdmin):
+    # TODO action 可以删掉数据
+    actions = ['do_scan_by_config']
+    list_filter = ['contract', 'scan_type', 'status']
+    list_display = ('__str__', 'contract', 'scan_type', 'status', 'create_time')
+
+    @admin.action(description='Do scan by config')
+    def do_scan_by_config(self, request, queryset):
+        for config in queryset:
+            if config.scan_type == ScanTypeEnum.Event:
+                scan_contract_event_by_config(config)
+            elif config.scan_type == ScanTypeEnum.Transaction:
+                scan_contract_transactions_by_config(config)
+
+    def get_readonly_fields(self, request, obj=None):
+        if obj:
+            return ['contract', 'scan_type', 'from_address_filter_list', 'to_address_filter_list', 'topic_filter_list',
+                    'function_filter_list', 'create_time', 'update_time']
+        else:
+            return ['create_time', 'update_time']
+
+class ContractTransactionScanTaskAdmin(admin.ModelAdmin):
+    actions = ['do_scan_by_task']
+    list_filter = ['contract', 'status']
+    list_display = ('__str__', 'contract', 'block_range', 'status', 'create_time')
+    readonly_fields = ['create_time', 'update_time']
+
+    @admin.display(ordering='start_block_id', description='Scan block range')
+    def block_range(self, instance):
+        # TODO text align
+        return "[{} ~ {})".format(instance.start_block_id, instance.end_block_id)
+
+    @admin.action(description='Do scan by task')
+    def do_scan_by_task(self, request, queryset):
+        for task in queryset:
+            execute_unfinished_trans_scan_task(task)
+
+class ContractEventScanTaskAdmin(admin.ModelAdmin):
+    actions = ['do_scan_by_task']
+    list_filter = ['contract', 'status']
+    list_display = ('__str__', 'contract', 'block_range', 'status', 'create_time')
+    readonly_fields = ['create_time', 'update_time']
+
+    @admin.display(ordering='start_block_id', description='Scan block range')
+    def block_range(self, instance):
+        # TODO text align
+        return "[{} ~ {})".format(instance.start_block_id, instance.end_block_id)
+
+    @admin.action(description='Do scan by task')
+    def do_scan_by_task(self, request, queryset):
+        for task in queryset:
+            execute_unfinished_event_scan_task(task)
+
+class ContractTransactionAdmin(admin.ModelAdmin):
+    # TODO search for some field
+    actions = ['retouch_trans']
+    list_display = ['__str__', 'contract', 'function_name', 'status', 'create_time']
+    readonly_fields = ['create_time']
+    list_filter = ['status']
+
+    @admin.action(description='Retouch trans')
+    def retouch_trans(self, request, queryset: List[ContractTransaction]):
+        order_queryset = queryset.order_by('block_number')
+        for trans in order_queryset:
+            trans.status = ProcessingStatusEnum.INITIAL
+            trans.save()
+
+class ContractEventAdmin(admin.ModelAdmin):
+    actions = ['retouch_event']
+    list_display = ['__str__', 'contract', 'topic', 'status', 'create_time']
+    readonly_fields = ['create_time']
+    list_filter = ['status']
+
+
+    @admin.action(description='Retouch event')
+    def retouch_event(self, request, queryset: List[ContractEvent]):
+        for event in queryset:
+            event.status = ProcessingStatusEnum.INITIAL
+            event.save()
+
+admin.site.register(EtherScanConfig, EtherScanConfigAdmin)
+admin.site.register(ContractTransactionScanTask, ContractTransactionScanTaskAdmin)
+admin.site.register(ContractEventScanTask, ContractEventScanTaskAdmin)
+admin.site.register(ContractTransaction, ContractTransactionAdmin)
+admin.site.register(ContractEvent, ContractEventAdmin)

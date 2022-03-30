@@ -1,0 +1,41 @@
+[
+  {
+    "model": "blockchain.blockchain",
+    "pk": 1337,
+    "fields": {
+      "fullname": "Izumi Test",
+      "symbol": "iZi",
+      "vm_type": "EVM",
+      "rpc_url": "http://47.241.103.6:9545/",
+      "gas_price_wei": 5000000000,
+      "create_time": "2022-01-11T22:33:40.246",
+      "update_time": "2022-01-01T12:00:00"
+    }
+  },
+  {
+    "model": "blockchain.blockchain",
+    "pk": 80001,
+    "fields": {
+      "fullname": "Matic Testnet",
+      "symbol": "MATICtest",
+      "vm_type": "EVM",
+      "rpc_url": "https://rpc-mumbai.maticvigil.com:443",
+      "gas_price_wei": 10000000000,
+      "create_time": "2022-01-21T12:00:00",
+      "update_time": "2021-01-01T12:00:00"
+    }
+  },
+  {
+    "model": "blockchain.blockchain",
+    "pk": 1666600000,
+    "fields": {
+      "fullname": "Harmony",
+      "symbol": "ONE",
+      "vm_type": "EVM",
+      "rpc_url": "https://api.harmony.one",
+      "gas_price_wei": 5000000000,
+      "create_time": "2022-01-01T15:40:23.184",
+      "update_time": "2021-01-01T12:00:00"
+    }
+  }
+]

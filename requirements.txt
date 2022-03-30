@@ -1,0 +1,19 @@
+Django == 3.2.4
+djangorestframework == 3.12.4
+redis == 3.5.3
+mysqlclient == 2.0.3
+django-redis == 5.0.0
+celery == 5.1.1
+django_celery_beat == 2.2.0
+celery-once == 3.0.1
+
+# plugin
+django-cors-headers==3.7.0
+
+# blockchain
+web3 == 5.20.0
+eth-event == 1.2.3
+
+# lib
+intervaltree==3.1.0
+cachetools==5.0.0

@@ -1,0 +1,148 @@
+# -*- coding: utf-8 -*-
+import json
+import logging
+from typing import Any, Dict, List, Tuple
+
+from web3.datastructures import AttributeDict
+from izumi_infra.blockchain.context import contractHolder
+
+from django.db.utils import IntegrityError
+from django.conf import settings
+
+from izumi_infra.etherscan.conf import etherscan_settings
+from izumi_infra.blockchain.models import Contract
+from izumi_infra.etherscan.constants import FILTER_SPLIT_CHAR, ScanConfigStatusEnum, ScanFilterTypeEnum, ScanTaskStatusEnum, ScanTypeEnum
+from izumi_infra.etherscan.models import ContractEvent, ContractEventScanTask, EtherScanConfig
+from izumi_infra.etherscan.types import EventExtra, EventExtraData
+from izumi_infra.utils.collection_util import chunks
+
+logger = logging.getLogger(__name__)
+
+
+def scan_all_contract_event() -> None:
+    """
+    Entry for the event info sync from blockchain.
+    """
+
+    event_scan_config_list = EtherScanConfig.objects.filter(
+        scan_type=ScanTypeEnum.Event,
+        status=ScanConfigStatusEnum.ENABLE
+    ).all()
+
+    for event_scan_config in event_scan_config_list:
+        scan_contract_event_by_config(event_scan_config)
+
+def scan_contract_event_by_config(event_scan_config: EtherScanConfig):
+    try:
+        add_event_scan_task(event_scan_config)
+    except Exception as e:
+        logger.exception(e)
+
+    unfinished_tasks = ContractEventScanTask.objects.filter(
+        contract=event_scan_config.contract,
+        status=ScanTaskStatusEnum.INITIAL
+    )
+
+    for task in unfinished_tasks:
+        try:
+            execute_unfinished_event_scan_task(task)
+        except Exception as e:
+            logger.error("execute_unfinished_event_scan_task error, task: {}", task)
+            logger.exception(e)
+
+
+def add_event_scan_task(event_scan_config: EtherScanConfig):
+    """
+    Add scan task according to config
+    """
+    event_contract = event_scan_config.contract
+
+    contract_facade = contractHolder.get_facade_by_model(event_contract)
+
+    block_id_now = contract_facade.get_lastest_block_number()
+    end_block_id = block_id_now - event_scan_config.stable_block_offset
+    last_task = ContractEventScanTask.objects.filter(contract=event_contract).order_by('-end_block_id').first()
+    start_block_id = last_task.end_block_id if last_task else max(end_block_id - etherscan_settings.TASK_BATCH_SCAN_BLOCK, 0)
+
+    if start_block_id >= end_block_id: return []
+
+    block_range_partion = list(chunks(range(start_block_id, end_block_id), etherscan_settings.TASK_BATCH_SCAN_BLOCK))
+    new_event_scan_task = list(map(lambda br:  ContractEventScanTask(scan_config=event_scan_config, contract=event_contract,
+                                        start_block_id=br.start, end_block_id=br.stop), block_range_partion))
+
+    ContractEventScanTask.objects.bulk_create(new_event_scan_task)
+    return new_event_scan_task
+
+
+def execute_unfinished_event_scan_task(unfinished_task: ContractEventScanTask) -> None:
+    if unfinished_task.status != ScanTaskStatusEnum.INITIAL: return
+
+    event_extra = scan_event_by_task(unfinished_task)
+    is_all_success = insert_contract_event(unfinished_task, event_extra)
+
+    if is_all_success:
+        unfinished_task.status = ScanTaskStatusEnum.FINISHED
+        unfinished_task.save()
+
+# TODO group chain scan
+def scan_event_by_task(unfinished_task: ContractEventScanTask) -> List[EventExtra]:
+    contract_facade = contractHolder.get_facade_by_model(unfinished_task.contract)
+    from_address_filter_list = unfinished_task.scan_config.from_address_filter_list
+    to_address_filter_list = unfinished_task.scan_config.to_address_filter_list
+    topic_filter_list = unfinished_task.scan_config.topic_filter_list
+    topic_filter_set = set([t.strip() for t in topic_filter_list.split(FILTER_SPLIT_CHAR) if t.strip()])
+    to_address_set = set([a.strip() for a in to_address_filter_list.split(FILTER_SPLIT_CHAR) if a.strip()])
+
+    event_logs = contract_facade.get_event_logs_by_name(unfinished_task.start_block_id,
+                                    unfinished_task.end_block_id, topic_filter_set, to_address_set)
+    # TODO timestamp ?
+    # block_numbers = set([e['blockNumber'] for e in event_logs])
+    # get block by block_numbers
+
+    event_extra = [ EventExtra(event=e, extra=EventExtraData(data=contract_facade.decode_event_log(e))) for e in event_logs ]
+
+    # fromAddress if filter
+    if from_address_filter_list:
+        from_address_set = set(map(lambda a: a.strip(), from_address_filter_list.split(FILTER_SPLIT_CHAR)))
+        for ex in event_extra:
+            from_address = contract_facade.get_transaction_by_tx_hash(ex['event']['transactionHash'])['from']
+            ex['extra']['fromAddress'] = from_address
+
+        event_extra = list(filter(lambda ex: ex['extra']['fromAddress'] in from_address_set, event_extra))
+
+    return event_extra
+
+def insert_contract_event(unfinished_task: ContractEventScanTask, event_extra: List[EventExtra]) -> bool:
+    """
+    Insert event logs scanned in blockchian event which topic is OrderCreated
+    """
+    failed_count = 0
+    contract_facade = contractHolder.get_facade_by_model(unfinished_task.contract)
+    max_deliver_retry = unfinished_task.scan_config.max_deliver_retry
+
+    for event in event_extra:
+        try:
+            event_log = event['event']
+            extra = event['extra']
+            event_record = {
+                'contract': unfinished_task.contract,
+                'topic': contract_facade.topic_to_topic_name_mapping.get(event_log['topics'][0].hex()),
+                'block_hash': event_log['blockHash'].hex(),
+                'block_number': event_log['blockNumber'],
+                'from_address': extra.get('fromAddress', ''),
+                'address': event_log['address'],
+                'transaction_hash': event_log['transactionHash'].hex(),
+                'transaction_index': event_log['transactionIndex'],
+                'data': json.dumps(extra['data']),
+                'touch_count_remain': max_deliver_retry
+            }
+            ContractEvent.objects.create(**event_record)
+        except IntegrityError:
+            # TODO 除了约束冲突，其他情况梳理
+            logger.warn('ignore duplicate event, block: %d, hash: %s, topic: %s',
+                        event_record['block_number'], event_record['block_hash'], event_record['topic'])
+        except Exception as e:
+            failed_count = failed_count + 1
+            logger.exception(e)
+
+    return (failed_count == 0)

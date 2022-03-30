@@ -1,0 +1,80 @@
+[
+  {
+    "model": "blockchain.contract",
+    "pk": 0,
+    "fields": {
+      "name": "Bridge_BSC",
+      "type": "BRIDGE",
+      "status": 2,
+      "chain": 1,
+      "contract_address": "0x7667a2501aE07D4E4Eef6a552f85aB520643D83b",
+      "create_time": "2021-07-03T16:16:08.726",
+      "update_time": "2021-07-03T16:16:08.726"
+    }
+  },
+  {
+    "model": "blockchain.contract",
+    "pk": 1,
+    "fields": {
+      "name": "Bridge_MATIC",
+      "type": "BRIDGE",
+      "status": 2,
+      "chain": 2,
+      "contract_address": "0x7667a2501aE07D4E4Eef6a552f85aB520643D83b",
+      "create_time": "2021-07-03T16:16:37.332",
+      "update_time": "2021-07-03T16:16:37.332"
+    }
+  },
+  {
+    "model": "blockchain.contract",
+    "pk": 2,
+    "fields": {
+      "name": "Bridge_Fantom",
+      "type": "BRIDGE",
+      "status": 2,
+      "chain": 3,
+      "contract_address": "0x7667a2501aE07D4E4Eef6a552f85aB520643D83b",
+      "create_time": "2021-07-03T17:30:13.338",
+      "update_time": "2021-07-03T17:30:13.338"
+    }
+  },
+  {
+    "model": "blockchain.contract",
+    "pk": 3,
+    "fields": {
+      "name": "Bridge_Harmony",
+      "type": "BRIDGE",
+      "status": 2,
+      "chain": 4,
+      "contract_address": "0x7667a2501aE07D4E4Eef6a552f85aB520643D83b",
+      "create_time": "2021-07-07T15:41:12.759",
+      "update_time": "2021-07-07T15:41:12.759"
+    }
+  },
+  {
+    "model": "blockchain.contract",
+    "pk": 4,
+    "fields": {
+      "name": "Bridge_Heco",
+      "type": "BRIDGE",
+      "status": 2,
+      "chain": 5,
+      "contract_address": "0x7667a2501aE07D4E4Eef6a552f85aB520643D83b",
+      "create_time": "2021-07-14T17:38:32.497",
+      "update_time": "2021-07-14T17:38:32.497"
+    }
+  },
+  {
+    "model": "blockchain.contract",
+    "pk": 100,
+    "fields": {
+      "name": "DeFi Uniswap SwapRouter",
+      "type": "UNISWAP_SWAP_ROUTER",
+      "status": 2,
+      "chain": 6,
+      "contract_address": "0xE592427A0AEce92De3Edee1F18E0157C05861564",
+      "create_time": "2021-08-03T12:00:00.000",
+      "update_time": "2021-08-05T12:00:00.000"
+    }
+  }
+]
