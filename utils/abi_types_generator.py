@@ -1,8 +1,8 @@
-
+# -*- coding: utf-8 -*-
 import json
-import re
-from typing import TypedDict, List
 import os
+import re
+from typing import List, TypedDict
 
 # TODO Solidity list ?
 TYPE_MAPPING = {

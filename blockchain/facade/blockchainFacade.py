@@ -11,7 +11,7 @@ from izumi_infra.blockchain.constants import BlockChainVmEnum
 from izumi_infra.blockchain.types import ContractMeta, TokenInfo
 from izumi_infra.etherscan.conf import etherscan_settings
 from izumi_infra.utils.collection_util import chunks
-from utils.exceptions import NoEntriesFound
+from izumi_infra.utils.exceptions import NoEntriesFound
 
 
 class BlockchainFacade():

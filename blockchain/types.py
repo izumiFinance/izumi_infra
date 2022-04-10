@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from typing import Dict, List, TypedDict
+from datetime import datetime
+from typing import Dict, List, NewType, TypedDict
 from eth_typing.evm import ChecksumAddress
 
 from izumi_infra.blockchain.constants import ChainIdEnum, BaseContractABI, TokenSymbol
@@ -29,3 +30,12 @@ class Erc20TokenInfo(TypedDict):
     address: str
     symbol: str
     decimals: int
+
+class TokenData(TypedDict):
+    address: str
+    symbol: str
+    name: str
+    price: float
+    price_time: datetime
+
+TokenConfigType = NewType('TokenConfigType', Dict[ChainIdEnum, Dict[TokenSymbol, TokenMeta]])

@@ -67,27 +67,27 @@ class ContractEventScanTaskAdmin(admin.ModelAdmin):
 class ContractTransactionAdmin(admin.ModelAdmin):
     # TODO search for some field
     actions = ['retouch_trans']
-    list_display = ['__str__', 'contract', 'function_name', 'status', 'create_time']
+    list_display = ['id', 'contract', 'function_name', 'status', 'block_number', 'create_time']
     readonly_fields = ['create_time']
     list_filter = ['status']
 
     @admin.action(description='Retouch trans')
     def retouch_trans(self, request, queryset: List[ContractTransaction]):
-        order_queryset = queryset.order_by('block_number')
+        order_queryset = queryset.order_by('block_number', 'transaction_index')
         for trans in order_queryset:
             trans.status = ProcessingStatusEnum.INITIAL
             trans.save()
 
 class ContractEventAdmin(admin.ModelAdmin):
     actions = ['retouch_event']
-    list_display = ['__str__', 'contract', 'topic', 'status', 'create_time']
+    list_display = ['id', 'contract', 'topic', 'status', 'block_number', 'create_time']
     readonly_fields = ['create_time']
     list_filter = ['status']
 
-
     @admin.action(description='Retouch event')
     def retouch_event(self, request, queryset: List[ContractEvent]):
-        for event in queryset:
+        order_queryset = queryset.order_by('block_number', 'transaction_index')
+        for event in order_queryset:
             event.status = ProcessingStatusEnum.INITIAL
             event.save()
 

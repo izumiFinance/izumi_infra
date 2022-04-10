@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from enum import Enum
-from typing import List, Tuple
+from typing import Dict, List, Tuple
 from izumi_infra.utils.enum import StringFieldEnum, IntegerFieldEnum
 from izumi_infra.utils import abiJsonLoader
 
@@ -55,78 +55,6 @@ UPPER_SYMBOL_MAPPING = { t.value.upper(): t.value for t in TokenSymbol }
 def correct_symbol(symbol: str):
     symbol_upper = symbol.upper()
     return UPPER_SYMBOL_MAPPING.get(symbol_upper, symbol_upper)
-
-# basic TokenMeta like
-TokenConfig = {
-    ChainIdEnum.EthereumMainnet: {
-        TokenSymbol.USDT: {
-            'address': '0xdAC17F958D2ee523a2206206994597C13D831ec7',
-            'symbol': TokenSymbol.USDT,
-            'decimal': 6
-        },
-        TokenSymbol.USDC: {
-            'address': '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
-            'symbol': TokenSymbol.USDC,
-            'decimal': 6
-        },
-        TokenSymbol.iZi: {
-            'address': '0x9ad37205d608B8b219e6a2573f922094CEc5c200',
-            'symbol': TokenSymbol.iZi,
-            'decimal': 18
-        },
-        TokenSymbol.WETH: {
-            'address': '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
-            'symbol': TokenSymbol.WETH,
-            'decimal': 18
-        },
-        TokenSymbol.YIN: {
-            'address': '0x794Baab6b878467F93EF17e2f2851ce04E3E34C8',
-            'symbol': TokenSymbol.YIN,
-            'decimal': 18
-        },
-    },
-    ChainIdEnum.Matic: {
-        TokenSymbol.USDT: {
-            'address': '0xc2132D05D31c914a87C6611C10748AEb04B58e8F',
-            'symbol': TokenSymbol.USDT,
-            'decimal': 6
-        },
-        TokenSymbol.USDC: {
-            'address': '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174',
-            'symbol': TokenSymbol.USDC,
-            'decimal': 6
-        },
-        TokenSymbol.iZi: {
-            'address': '0x60D01EC2D5E98Ac51C8B4cF84DfCCE98D527c747',
-            'symbol': TokenSymbol.iZi,
-            'decimal': 18
-        },
-        TokenSymbol.YIN: {
-            'address': '0x794Baab6b878467F93EF17e2f2851ce04E3E34C8',
-            'symbol': TokenSymbol.YIN,
-            'decimal': 18
-        },
-    },
-     ChainIdEnum.Arbitrum: {
-        TokenSymbol.USDT: {
-            'address': '0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9',
-            'symbol': TokenSymbol.USDT,
-            'decimal': 6
-        },
-        TokenSymbol.USDC: {
-            'address': '0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8',
-            'symbol': TokenSymbol.USDC,
-            'decimal': 6
-        },
-        TokenSymbol.iZi: {
-            'address': '0x60D01EC2D5E98Ac51C8B4cF84DfCCE98D527c747',
-            'symbol': TokenSymbol.iZi,
-            'decimal': 18
-        },
-    }
-}
-
-TokenConfigAddrMapping = { c: { t['address']: t for t in v.values() } for c, v in TokenConfig.items() }
 
 class AccountContractRelationshipTypeEnum(StringFieldEnum):
     OWNER = "Account is the contract owner"

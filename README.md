@@ -66,3 +66,14 @@ support change default conf by set new object named `IZUMI_INFRA_ETHERSCAN`, or 
 `src/izumi_infra/etherscan/conf.py` for detail.
 
 ### utils
+
+### middleware
+
+add it to your django conf like
+
+```py
+MIDDLEWARE = [
+    ...
+    'middleware.exception_handler.ExceptionMiddleware'
+]
+```

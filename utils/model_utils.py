@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-from django.db import models
 from django.core.exceptions import ValidationError
+from django.db import models
 from django.utils.translation import gettext_lazy as _
-
 from eth_utils import is_address
 from eth_utils.address import is_checksum_address
+
 
 class UppercaseCharField(models.CharField):
     def __init__(self, *args, **kwargs):

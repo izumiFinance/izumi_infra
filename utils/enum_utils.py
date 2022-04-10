@@ -1,4 +1,4 @@
-from enum import Enum
+# -*- coding: utf-8 -*-
 
 def extend_enum(inherited_enum, EnumClz=None):
     def wrapper(added_enum):
