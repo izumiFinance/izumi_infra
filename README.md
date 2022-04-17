@@ -13,7 +13,7 @@ update izumi_infra package version
 
 1. rewire izumi_infra code until finished
 2. izumi_infra submodule git commit
-3. `git tag a 'v0.0.1 -m 'Your improve message'` then `git push origin --tags`
+3. `git tag a v0.0.1 -m 'Your improve message'` then `git push origin --tags`
 4. `git checkout v0.0.1`
 5. top git project commit
 

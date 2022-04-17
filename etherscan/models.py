@@ -1,13 +1,16 @@
 from django.conf import settings
 from django.db import models
 from django.db.models import F
-
-from izumi_infra.blockchain.models import Blockchain, Contract
-from izumi_infra.etherscan.constants import ProcessingStatusEnum, ScanConfigAuditLevelEnum, ScanConfigStatusEnum, ScanTaskStatusEnum, ScanTypeEnum, SubReceiverGroupEnum
 from django.utils.translation import gettext as _
 
-from izumi_infra.utils.model_utils import validate_checksum_address_list
+from izumi_infra.blockchain.models import Blockchain, Contract
 from izumi_infra.etherscan.conf import etherscan_settings
+from izumi_infra.etherscan.constants import (ProcessingStatusEnum,
+                                             ScanConfigAuditLevelEnum,
+                                             ScanConfigStatusEnum,
+                                             ScanTaskStatusEnum, ScanTypeEnum,
+                                             SubReceiverGroupEnum)
+from izumi_infra.utils.model_utils import validate_checksum_address_list
 
 # Create your models here.
 
@@ -57,7 +60,7 @@ class EtherScanConfig(models.Model):
         index_together = [['scan_type', 'status']]
 
     def __str__(self):
-        return 'EthScanCfg-{}-{}-{}'.format(str(self.id),  self.contract.type, ScanTypeEnum( self.scan_type).name)
+        return 'EthScanCfg-{}-{}-{}'.format(str(self.id),  getattr(self.contract, 'type', 'None'), ScanTypeEnum(self.scan_type).name)
 
 class ContractTransactionScanTask(models.Model):
     # TODO 索引
@@ -164,9 +167,9 @@ class ContractEvent(models.Model):
     block_number = models.PositiveBigIntegerField("blockNumber")
 
     # address which emit event
-    address = models.CharField("from", max_length=42, blank=True, default="")
+    address = models.CharField("emitAddress", max_length=42, blank=True, default="")
     # transaction info from and to
-    from_address = models.CharField("from", max_length=42, blank=True, default="")
+    from_address = models.CharField("fromAddress", max_length=42, blank=True, default="")
 
     # TODO 关联 ContractTransaction
     transaction_hash = models.CharField("hash", max_length=66)
