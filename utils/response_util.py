@@ -88,5 +88,5 @@ class CommonPagination(pagination.PageNumberPagination):
     def get_paginated_response(self, data):
         return ResponseUtil.success_with_list(data=data, total=self.page.paginator.count)
 
-def LargePagination(CommonPagination):
+class LargePagination(CommonPagination):
     max_page_size = 300

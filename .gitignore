@@ -27,8 +27,8 @@ _pycache_
 */_pycache_/*
 */*/_pycache_/*
 */migrations/*
-*/*/migrations/*
+**/*/migrations/*
 
 # keep it avoid remove the migrations folder
 !*/migrations/__init__.py
-!*/*/migrations/__init__.py
+!**/*/migrations/__init__.py

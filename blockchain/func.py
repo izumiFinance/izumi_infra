@@ -6,6 +6,9 @@ def tick2PriceSqrt(tick):
 def tick2Price(tick: int) -> float:
     return 1.0001 ** tick;
 
+def tick2PriceDecimal(tick: int, tokenXDecimals: int, tokenYDecimals: int) -> float:
+    return (1.0001 ** tick) * (10 ** tokenXDecimals / 10 ** tokenYDecimals)
+
 def liquidity2TokenAmount(liquidity, lowerTick, upperTick, currentTick):
     tokenAAmount = 0;
     tokenBAmount = 0;
