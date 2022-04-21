@@ -173,7 +173,7 @@ class ContractEvent(models.Model):
 
     # TODO 关联 ContractTransaction
     transaction_hash = models.CharField("hash", max_length=66)
-    transaction_index = models.PositiveSmallIntegerField("transactionIndex")
+    log_index = models.PositiveSmallIntegerField("logIndex")
 
     data = models.TextField("data")
 

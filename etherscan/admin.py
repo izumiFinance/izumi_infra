@@ -86,7 +86,7 @@ class ContractEventAdmin(admin.ModelAdmin):
 
     @admin.action(description='Retouch event')
     def retouch_event(self, request, queryset: List[ContractEvent]):
-        order_queryset = queryset.order_by('block_number', 'transaction_index')
+        order_queryset = queryset.order_by('block_number', 'log_index')
         for event in order_queryset:
             event.status = ProcessingStatusEnum.INITIAL
             event.save()
