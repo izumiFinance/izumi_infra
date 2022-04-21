@@ -204,7 +204,7 @@ class ContractEvent(models.Model):
         verbose_name = _("ContractEvent")
         verbose_name_plural = _("ContractEvent")
         index_together = [['contract', 'topic', 'status'], ['create_time', 'status', 'touch_count_remain']]
-        unique_together = [['transaction_hash', 'topic']]
+        unique_together = [['transaction_hash', 'log_index']]
 
     def __str__(self):
         return "ContractEvent-" + str(self.id)

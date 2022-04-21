@@ -132,15 +132,15 @@ def insert_contract_event(unfinished_task: ContractEventScanTask, event_extra: L
                 'from_address': extra.get('fromAddress', ''),
                 'address': event_log['address'],
                 'transaction_hash': event_log['transactionHash'].hex(),
-                'transaction_index': event_log['transactionIndex'],
+                'log_index': event_log['logIndex'],
                 'data': json.dumps(extra['data']),
                 'touch_count_remain': max_deliver_retry
             }
             ContractEvent.objects.create(**event_record)
         except IntegrityError:
             # TODO 除了约束冲突，其他情况梳理
-            logger.warn('ignore duplicate event, block: %d, hash: %s, topic: %s',
-                        event_record['block_number'], event_record['block_hash'], event_record['topic'])
+            logger.warn('ignore duplicate event, block: %d, hash: %s, logIndex: %d, topic: %s',
+                        event_record['block_number'], event_record['block_hash'], event_record['log_index'], event_record['topic'])
         except Exception as e:
             failed_count = failed_count + 1
             logger.exception(e)
