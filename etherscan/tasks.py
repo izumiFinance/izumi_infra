@@ -9,6 +9,7 @@ from izumi_infra.etherscan.facade.scanEntityFacade import scan_and_touch_entity
 
 from izumi_infra.etherscan.facade.scanEventFacade import scan_all_contract_event
 from izumi_infra.etherscan.facade.scanTransFacade import scan_all_contract_transactions
+from izumi_infra.utils.date_utils import PYTHON_DATE_FORMAT, dayRange
 
 logger = logging.getLogger(__name__)
 
@@ -35,19 +36,35 @@ def etherscan_touch_unprocessed_entity_task():
 @shared_task(base=QueueOnce, name='etherscan_audit_event_scan_task')
 def etherscan_audit_event_scan_task(*args, **kwargs):
     audit_slice_hours = kwargs.get('audit_slice_hours', 24)
-    offset_trigger_hours = kwargs.get('offset_trigger_hours', 6)
-    trigger_time = datetime.now()
-    audit_start_time = trigger_time - timedelta(hours=(audit_slice_hours+offset_trigger_hours))
-    logger.info("start etherscan_audit_event_scan_task at %s", trigger_time)
 
-    audit_event_entry(audit_start_time, audit_slice_hours)
+    startDate = kwargs.get('startDate', None)
+    endDate = kwargs.get('endDate', None)
+    # default audit last day
+    audit_start_time_list = [datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)-timedelta(days=1)]
+    if startDate and endDate:
+        logger.info("audit event param: [%s, %s)", startDate, endDate)
+        start_date = datetime.strptime(startDate, PYTHON_DATE_FORMAT)
+        end_date = datetime.strptime(endDate, PYTHON_DATE_FORMAT)
+        audit_start_time_list = list(dayRange(start_date, end_date))
+
+    for audit_start_time in audit_start_time_list:
+        logger.info("start audit event day: %s", datetime.strftime(audit_start_time, PYTHON_DATE_FORMAT))
+        audit_event_entry(audit_start_time, audit_slice_hours)
 
 @shared_task(base=QueueOnce, name='etherscan_audit_trans_scan_task')
 def etherscan_audit_trans_scan_task(*args, **kwargs):
     audit_slice_hours = kwargs.get('audit_slice_hours', 24)
-    offset_trigger_hours = kwargs.get('offset_trigger_hours', 6)
-    trigger_time = datetime.now()
-    audit_start_time = trigger_time - timedelta(hours=(audit_slice_hours+offset_trigger_hours))
-    logger.info("start etherscan_audit_trans_scan_task at %s", trigger_time)
 
-    audit_trans_entry(audit_start_time, audit_slice_hours)
+    startDate = kwargs.get('startDate', None)
+    endDate = kwargs.get('endDate', None)
+    # default audit last day
+    audit_start_time_list = [datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)-timedelta(days=1)]
+    if startDate and endDate:
+        logger.info("audit trans param: [%s, %s)", startDate, endDate)
+        start_date = datetime.strptime(startDate, PYTHON_DATE_FORMAT)
+        end_date = datetime.strptime(endDate, PYTHON_DATE_FORMAT)
+        audit_start_time_list = list(dayRange(start_date, end_date))
+
+    for audit_start_time in audit_start_time_list:
+        logger.info("start audit trans day: %s", datetime.strftime(audit_start_time, PYTHON_DATE_FORMAT))
+        audit_trans_entry(audit_start_time, audit_slice_hours)

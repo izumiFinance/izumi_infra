@@ -154,7 +154,7 @@ def check_undetected_trans(scan_tasks: QuerySet[ContractTransactionScanTask], au
 
     detected_trans_hash_set = set(map(lambda t: t['transaction_hash'], detected_trans))
     undetected_trans_trans_hash = set(trans_hash_to_trans_dict.keys()).difference(detected_trans_hash_set)
-    logger.error("undetected trans trans hash: %s, for scan taks like: %s",
+    logger.error("undetected trans trans hash: %s, for scan task like: %s",
                 undetected_trans_trans_hash, template_task)
 
     if etherscan_settings.ETHERSCAN_AUDIT_AUTO_FIX_MISSING_TASK:

@@ -94,7 +94,7 @@ def scan_event_by_task(unfinished_task: ContractEventScanTask) -> List[EventExtr
     to_address_set = set([a.strip() for a in to_address_filter_list.split(FILTER_SPLIT_CHAR) if a.strip()])
 
     event_logs = contract_facade.get_event_logs_by_name(unfinished_task.start_block_id,
-                                    unfinished_task.end_block_id, topic_filter_set, to_address_set)
+                                    unfinished_task.end_block_id - 1, topic_filter_set, to_address_set)
     # TODO timestamp ?
     # block_numbers = set([e['blockNumber'] for e in event_logs])
     # get block by block_numbers

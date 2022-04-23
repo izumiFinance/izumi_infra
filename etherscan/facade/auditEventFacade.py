@@ -143,22 +143,23 @@ def check_undetected_event(scan_tasks: QuerySet[ContractEventScanTask], audit_bl
     events = scan_event_by_task(template_task)
     if not events: return True
 
-    trans_hash_to_event_dict = dict(map(lambda e: (e['event']['transactionHash'].hex(), e), events))
-    detected_events = ContractEvent.objects.filter(
-        transaction_hash__in=trans_hash_to_event_dict.keys()
-    ).values('transaction_hash').all()
+    audit_event_trans_hash_set = set([ e['event']['transactionHash'].hex() for e in events ])
+    db_detected_events = ContractEvent.objects.filter(
+        transaction_hash__in=audit_event_trans_hash_set
+    ).values('transaction_hash', 'log_index').all()
 
-    if len(detected_events) == len(trans_hash_to_event_dict):
+    detected_event_hash_index_set = set(['{}-{}'.format(e['transaction_hash'], e['log_index']) for e in db_detected_events])
+    audit_event_hash_index_dict = {'{}-{}'.format(e['event']['transactionHash'].hex(), e['event']['logIndex']): e for e in events}
+    undetected_event_event_hash = set(audit_event_hash_index_dict.keys()).difference(detected_event_hash_index_set)
+
+    if len(undetected_event_event_hash) == 0:
         return True
 
-    detected_event_hash_set = set(map(lambda e: e['transaction_hash'], detected_events))
-    undetected_event_event_hash = set(trans_hash_to_event_dict.keys()).difference(detected_event_hash_set)
-    logger.error("undetected event trans hash: %s, for scan task like: %s",
-                undetected_event_event_hash, template_task)
+    logger.error("undetected event trans hash: %s, for scan task like: %s", undetected_event_event_hash, template_task)
 
     if etherscan_settings.ETHERSCAN_AUDIT_AUTO_FIX_MISSING_TASK:
         for trans_hash in undetected_event_event_hash:
-            event_extra = trans_hash_to_event_dict[trans_hash]
+            event_extra = audit_event_hash_index_dict[trans_hash]
             block_number = event_extra['event']['blockNumber']
             # reopen scan task
             scan_tasks.filter(
