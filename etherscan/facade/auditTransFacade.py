@@ -24,7 +24,7 @@ def audit_trans_entry(audit_start_datetime: datetime, audit_slice_hours=24):
     audit_min = audit_slice_hours * 60
     merge_min = etherscan_settings.ETHERSCAN_AUDIT_TASK_MERGE_MINUTES
     if audit_min < merge_min or (audit_min % merge_min) != 0:
-        logger.error("invalid trans audit slice range: %d min and merge slice range: %d min", audit_min, merge_min)
+        logger.error(f"invalid trans audit slice range: {audit_min} min and merge slice range: {merge_min} min")
 
     start_time = audit_start_datetime.replace(minute=0, second=0, microsecond=0)
     end_time = start_time + timedelta(hours=audit_slice_hours)
@@ -105,7 +105,7 @@ def check_uncover_scan_tasks(scan_tasks: QuerySet[ContractTransactionScanTask], 
     audit_block_range = IntervalTree([Interval(audit_block_id_range.start, audit_block_id_range.stop, 'main')])
     for scan_task in scan_tasks:
         if scan_task.status != ScanTaskStatusEnum.FINISHED:
-            logger.error("contain unfinished scan task: %s, abort merge", scan_task)
+            logger.error(f"contain unfinished scan task: {scan_task}, abort merge")
             return False
 
         audit_block_range.chop(scan_task.start_block_id, scan_task.end_block_id)
@@ -113,8 +113,7 @@ def check_uncover_scan_tasks(scan_tasks: QuerySet[ContractTransactionScanTask], 
     if audit_block_range.is_empty():
         return True
 
-    logger.error("uncover scan block id range: %s, for scan task like: %s",
-                    audit_block_range, template_task)
+    logger.error(f"uncover scan block id range: {audit_block_range}, for scan task like: {template_task}")
 
     if not audit_block_range.is_empty() and etherscan_settings.ETHERSCAN_AUDIT_AUTO_FIX_MISSING_TASK:
         for missing_range in audit_block_range:
@@ -154,8 +153,7 @@ def check_undetected_trans(scan_tasks: QuerySet[ContractTransactionScanTask], au
 
     detected_trans_hash_set = set(map(lambda t: t['transaction_hash'], detected_trans))
     undetected_trans_trans_hash = set(trans_hash_to_trans_dict.keys()).difference(detected_trans_hash_set)
-    logger.error("undetected trans trans hash: %s, for scan task like: %s",
-                undetected_trans_trans_hash, template_task)
+    logger.error(f"undetected trans trans hash: {undetected_trans_trans_hash}, for scan task like: {template_task}")
 
     if etherscan_settings.ETHERSCAN_AUDIT_AUTO_FIX_MISSING_TASK:
         for trans_hash in undetected_trans_trans_hash:

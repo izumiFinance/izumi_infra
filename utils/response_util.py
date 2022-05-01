@@ -21,7 +21,7 @@ class ResponseUtil(Response):
     def __init__(self, is_success: bool, data=None, is_idempotent: bool=False, total: int=-1,
                        error_code: str=None, error_msg: str=None, debug_msg: str=None):
         if debug_msg and not settings.DEBUG:
-            logger.exception("{}".format(debug_msg))
+            logger.exception(f"{debug_msg}")
 
         content = {
                     "is_success": is_success,

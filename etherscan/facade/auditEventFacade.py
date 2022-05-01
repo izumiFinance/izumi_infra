@@ -23,7 +23,7 @@ def audit_event_entry(audit_start_datetime: datetime, audit_slice_hours=24):
     audit_min = audit_slice_hours * 60
     merge_min = etherscan_settings.ETHERSCAN_AUDIT_TASK_MERGE_MINUTES
     if audit_min < merge_min or (audit_min % merge_min) != 0:
-        logger.error("invalid event audit slice range: %d min and merge slice range: %d min", audit_min, merge_min)
+        logger.error(f"invalid event audit slice range: {audit_min} min and merge slice range: {merge_min} min")
 
     start_time = audit_start_datetime.replace(minute=0, second=0, microsecond=0)
     end_time = start_time + timedelta(hours=audit_slice_hours)
@@ -105,7 +105,7 @@ def check_uncover_scan_tasks(scan_tasks: QuerySet[ContractEventScanTask], audit_
     audit_block_range = IntervalTree([Interval(audit_block_id_range.start, audit_block_id_range.stop, 'main')])
     for scan_task in scan_tasks:
         if scan_task.status != ScanTaskStatusEnum.FINISHED:
-            logger.error("contain unfinished scan task: %s, abort merge", scan_task)
+            logger.error(f"contain unfinished scan task: {scan_task}, abort merge")
             return False
 
         audit_block_range.chop(scan_task.start_block_id, scan_task.end_block_id)
@@ -113,8 +113,7 @@ def check_uncover_scan_tasks(scan_tasks: QuerySet[ContractEventScanTask], audit_
     if audit_block_range.is_empty():
         return True
 
-    logger.error("uncover scan block id range: %s, for scan task like: %s",
-                    audit_block_range, template_task)
+    logger.error(f"uncover scan block id range: {audit_block_range}, for scan task like: {template_task}")
 
     if not audit_block_range.is_empty() and etherscan_settings.ETHERSCAN_AUDIT_AUTO_FIX_MISSING_TASK:
         for missing_range in audit_block_range:
@@ -155,7 +154,7 @@ def check_undetected_event(scan_tasks: QuerySet[ContractEventScanTask], audit_bl
     if len(undetected_event_event_hash) == 0:
         return True
 
-    logger.error("undetected event trans hash: %s, for scan task like: %s", undetected_event_event_hash, template_task)
+    logger.error(f"undetected event trans hash: {undetected_event_event_hash}, for scan task like: {template_task}")
 
     if etherscan_settings.ETHERSCAN_AUDIT_AUTO_FIX_MISSING_TASK:
         for trans_hash in undetected_event_event_hash:

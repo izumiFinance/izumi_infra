@@ -34,6 +34,7 @@ def scan_contract_transactions_by_config(trans_scan_config: ContractTransactionS
     try:
         add_trans_scan_task(trans_scan_config)
     except Exception as e:
+        logger.error(f"scan_contract_transactions_by_config exception for task: {trans_scan_config}")
         logger.exception(e)
 
     unfinished_tasks = ContractTransactionScanTask.objects.filter(
@@ -45,7 +46,7 @@ def scan_contract_transactions_by_config(trans_scan_config: ContractTransactionS
         try:
             execute_unfinished_trans_scan_task(task)
         except Exception as e:
-            logger.error("execute_unfinished_trans_scan_task error, task: {}", task)
+            logger.error(f"execute_unfinished_trans_scan_task error, task: {task}")
             logger.exception(e)
 
 def add_trans_scan_task(trans_scan_config: EtherScanConfig):

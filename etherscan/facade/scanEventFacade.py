@@ -36,6 +36,7 @@ def scan_contract_event_by_config(event_scan_config: EtherScanConfig):
     try:
         add_event_scan_task(event_scan_config)
     except Exception as e:
+        logger.error(f"scan_contract_event_by_config exception for task: {event_scan_config}")
         logger.exception(e)
 
     unfinished_tasks = ContractEventScanTask.objects.filter(
@@ -47,7 +48,7 @@ def scan_contract_event_by_config(event_scan_config: EtherScanConfig):
         try:
             execute_unfinished_event_scan_task(task)
         except Exception as e:
-            logger.error("execute_unfinished_event_scan_task error, task: {}", task)
+            logger.error(f"execute_unfinished_event_scan_task error, task: {task}")
             logger.exception(e)
 
 

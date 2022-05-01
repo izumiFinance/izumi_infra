@@ -47,7 +47,7 @@ class AccountFacade():
                                                                 blockchain_settings.SIGN_RANDOM_GAS_PRICE_WEI_OFFSET)
                 data['gasPrice'] = max(data['gasPrice'], 0)
                 try_cnt = try_cnt + 1
-                logger.error('duplicate trans sign r value: %s, try times: %d', r_hex_str, try_cnt)
+                logger.error(f'duplicate trans sign r value: {r_hex_str}, try times: {try_cnt}')
                 if try_cnt >= blockchain_settings.SIGN_MAX_RETRY_COUNT:
                     raise Exception("exceed max retry sign trans {} times".format(try_cnt))
 

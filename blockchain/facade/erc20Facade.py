@@ -80,6 +80,6 @@ def estimate_block_number_by_time(chain_id: int, timestamp: int):
             block = blockchain.w3.eth.getBlock(block_number)
             return block.timestamp
         except Exception as e:
-            logger.error("block number: %d", block_number)
+            logger.error(f"block number: {block_number}")
 
     return block_near_time(timestamp, get_block_timestamp, 1, ilatest, ilatest)

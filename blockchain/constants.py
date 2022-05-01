@@ -46,6 +46,8 @@ class TokenSymbol(StringFieldEnum):
     LIDO = 'LIDO'
     WETH = 'WETH'
     YIN = 'YIN'
+    WBNB = 'WBNB'
+    iUSD = 'iUSD'
 
     RDT = 'RDT'
     RDT2 = 'RDT2'

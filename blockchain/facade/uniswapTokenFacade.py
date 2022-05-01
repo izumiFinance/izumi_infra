@@ -170,8 +170,9 @@ class UniswapTokenHourDataFacade():
         self.hour_data_offset = timedelta(minutes=5)
 
     def time_to_hour_end_timestamp(self, time: datetime = None) -> int:
-        hour_time = (time if time else datetime.now() - self.hour_data_offset).replace(minute=0, second=0, microsecond=0)
-        return int(hour_time.timestamp())
+        # uniswap hour data 产出安全时间 10 minutes
+        hour_time = (time if time else datetime.now() - self.hour_data_offset) - timedelta(minutes=10)
+        return int(hour_time.replace(minute=0, second=0, microsecond=0).timestamp())
 
     def get_token_data_hour(self, token_addr_list: List[str], time: datetime = None, version=3) -> Dict[str, TokenData]:
         hour_end_timestamp = self.time_to_hour_end_timestamp(time)
@@ -183,6 +184,7 @@ class UniswapTokenHourDataFacade():
             }
         }
 
+        response = None
         try:
             query_url = self.thegraph_uniswap3_url if version == 3 else self.thegraph_uniswap2_url
             response = self.thegraph_uniswap3_session.post(url=query_url, json=payload)
@@ -202,6 +204,7 @@ class UniswapTokenHourDataFacade():
             return result
 
         except Exception as e:
+            logger.error(f"get_token_data_hour error, response: {response}")
             logger.exception(e)
             return {}
 

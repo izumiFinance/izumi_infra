@@ -25,5 +25,6 @@ class ExceptionMiddleware:
         if isinstance(exception, BizException):
             return ResponseUtil.fail_with_exception(exception).to_jsonresponse()
 
+        logger.error(f"BizException occurred by: {request}")
         logger.exception(exception)
         return ResponseUtil.fail_with_enum(CommonStatus.INTERNAL_ERROR).to_jsonresponse()

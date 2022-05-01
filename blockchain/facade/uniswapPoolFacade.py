@@ -71,11 +71,13 @@ class UniswapPoolFacade(BaseContext):
                 "address": pool_address.lower()
             }
         }
+        response = {}
         try:
             query_url = self.thegraph_uniswap3_url_mapping[chain_id]
             response = self.thegraph_uniswap3_session.post(url=query_url, json=payload)
             return json.loads(response.text)['data']['poolDayDatas'][0]
         except Exception as e:
+            logger.error(f'query_latest_pool_data error response: {response}')
             logger.exception(e)
             return {}
 
