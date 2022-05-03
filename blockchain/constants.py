@@ -48,6 +48,8 @@ class TokenSymbol(StringFieldEnum):
     YIN = 'YIN'
     WBNB = 'WBNB'
     iUSD = 'iUSD'
+    DOGE = 'DOGE'
+    SHIB = 'SHIB'
 
     RDT = 'RDT'
     RDT2 = 'RDT2'
