@@ -3,7 +3,8 @@ import os
 import logging
 
 from django.core.management.base import BaseCommand, CommandParser
-from apps.utils.abi_types_generator import abiTypesGenerator
+
+from izumi_infra.utils import abi_types_generator
 
 class Command(BaseCommand):
     help = 'Generate python type dict class define file from contract abi'
@@ -17,4 +18,4 @@ class Command(BaseCommand):
         files = options['files']
         for file_path in files:
             with open(file_path, 'r') as f:
-                print(abiTypesGenerator(f.read()))
+                print(abi_types_generator(f.read()))
