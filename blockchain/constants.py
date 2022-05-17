@@ -54,12 +54,6 @@ class TokenSymbol(StringFieldEnum):
     RDT = 'RDT'
     RDT2 = 'RDT2'
 
-UPPER_SYMBOL_MAPPING = { t.value.upper(): t.value for t in TokenSymbol }
-
-def correct_symbol(symbol: str):
-    symbol_upper = symbol.upper()
-    return UPPER_SYMBOL_MAPPING.get(symbol_upper, symbol_upper)
-
 class AccountContractRelationshipTypeEnum(StringFieldEnum):
     OWNER = "Account is the contract owner"
     TRUSTED = "Account trusted by contract"

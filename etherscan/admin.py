@@ -8,9 +8,7 @@ from izumi_infra.etherscan.facade.scanTransFacade import execute_unfinished_tran
 
 from izumi_infra.etherscan.models import ContractEvent, ContractEventScanTask, ContractTransaction, ContractTransactionScanTask, EtherScanConfig
 
-# Register your models here.
-
-
+@admin.register(EtherScanConfig)
 class EtherScanConfigAdmin(admin.ModelAdmin):
     # TODO action 可以删掉数据
     actions = ['do_scan_by_config']
@@ -32,11 +30,14 @@ class EtherScanConfigAdmin(admin.ModelAdmin):
         else:
             return ['create_time', 'update_time']
 
+@admin.register(ContractTransactionScanTask)
 class ContractTransactionScanTaskAdmin(admin.ModelAdmin):
     actions = ['do_scan_by_task']
     list_filter = ['contract', 'status']
     list_display = ('__str__', 'contract', 'block_range', 'status', 'create_time')
     readonly_fields = ['create_time', 'update_time']
+
+    search_fields = ['end_block_id']
 
     @admin.display(ordering='start_block_id', description='Scan block range')
     def block_range(self, instance):
@@ -48,11 +49,23 @@ class ContractTransactionScanTaskAdmin(admin.ModelAdmin):
         for task in queryset:
             execute_unfinished_trans_scan_task(task)
 
+    def get_search_results(self, request, queryset, search_term):
+        """
+        only search block id range in scan task
+        """
+        if search_term and search_term.isdigit():
+            block_id = int(search_term)
+            return queryset.filter(end_block_id__gt=block_id, start_block_id__lte=block_id), False
+        return queryset, False
+
+@admin.register(ContractEventScanTask)
 class ContractEventScanTaskAdmin(admin.ModelAdmin):
     actions = ['do_scan_by_task']
     list_filter = ['contract', 'status']
     list_display = ('__str__', 'contract', 'block_range', 'status', 'create_time')
     readonly_fields = ['create_time', 'update_time']
+
+    search_fields = ['end_block_id']
 
     @admin.display(ordering='start_block_id', description='Scan block range')
     def block_range(self, instance):
@@ -64,12 +77,24 @@ class ContractEventScanTaskAdmin(admin.ModelAdmin):
         for task in queryset:
             execute_unfinished_event_scan_task(task)
 
+    def get_search_results(self, request, queryset, search_term):
+        """
+        only search block id range in scan task
+        """
+        if search_term and search_term.isdigit():
+            block_id = int(search_term)
+            return queryset.filter(end_block_id__gt=block_id, start_block_id__lte=block_id), False
+        return queryset, False
+
+@admin.register(ContractTransaction)
 class ContractTransactionAdmin(admin.ModelAdmin):
     # TODO search for some field
     actions = ['retouch_trans']
     list_display = ['id', 'contract', 'function_name', 'status', 'block_number', 'create_time']
     readonly_fields = ['create_time']
     list_filter = ['status']
+
+    search_fields = ['transaction_hash__exact']
 
     @admin.action(description='Retouch trans')
     def retouch_trans(self, request, queryset: List[ContractTransaction]):
@@ -78,11 +103,14 @@ class ContractTransactionAdmin(admin.ModelAdmin):
             trans.status = ProcessingStatusEnum.INITIAL
             trans.save()
 
+@admin.register(ContractEvent)
 class ContractEventAdmin(admin.ModelAdmin):
     actions = ['retouch_event']
     list_display = ['id', 'contract', 'topic', 'status', 'block_number', 'create_time']
     readonly_fields = ['create_time']
     list_filter = ['status']
+
+    search_fields = ['transaction_hash__exact']
 
     @admin.action(description='Retouch event')
     def retouch_event(self, request, queryset: List[ContractEvent]):
@@ -90,9 +118,3 @@ class ContractEventAdmin(admin.ModelAdmin):
         for event in order_queryset:
             event.status = ProcessingStatusEnum.INITIAL
             event.save()
-
-admin.site.register(EtherScanConfig, EtherScanConfigAdmin)
-admin.site.register(ContractTransactionScanTask, ContractTransactionScanTaskAdmin)
-admin.site.register(ContractEventScanTask, ContractEventScanTaskAdmin)
-admin.site.register(ContractTransaction, ContractTransactionAdmin)
-admin.site.register(ContractEvent, ContractEventAdmin)

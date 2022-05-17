@@ -6,7 +6,7 @@
       "fullname": "Ethereum",
       "symbol": "ETH",
       "vm_type": "EVM",
-      "rpc_url": "https://mainnet.infura.io/v3/https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161",
+      "rpc_url": "https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161",
       "gas_price_wei": 5000000000,
       "create_time": "2022-01-01T12:00:00",
       "update_time": "2022-01-01T12:00:00"

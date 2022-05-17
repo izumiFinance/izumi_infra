@@ -23,7 +23,7 @@ class Blockchain(models.Model):
     update_time = models.DateTimeField("UpdateTime", auto_now=True)
 
     def __str__(self):
-        return u"Bl-" + str(self.symbol)
+        return f"Blockchain-{self.symbol}"
 
 class Contract(models.Model):
     id = models.PositiveBigIntegerField(primary_key=True)
@@ -81,7 +81,7 @@ class AccountContractRelationship(models.Model):
         unique_together = [['account', 'relation_type', 'contract']]
 
     def __str__(self):
-        return "{} <--{}--> {}".format(self.account, self.relation_type, self.contract)
+        return f"{self.account} <--{self.relation_type}--> {self.contract}"
 
 class TranscationSignInfo(models.Model):
     # 32 byte, 64 hex, add 0x then 66

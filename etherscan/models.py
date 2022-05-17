@@ -60,7 +60,7 @@ class EtherScanConfig(models.Model):
         index_together = [['scan_type', 'status']]
 
     def __str__(self):
-        return 'EthScanCfg-{}-{}-{}'.format(str(self.id),  getattr(self.contract, 'type', 'None'), ScanTypeEnum(self.scan_type).name)
+        return f'EthScanCfg-{self.id}-{getattr(self.contract, "type", "None")}-{ScanTypeEnum(self.scan_type).name}'
 
 class ContractTransactionScanTask(models.Model):
     # TODO 索引
@@ -85,15 +85,14 @@ class ContractTransactionScanTask(models.Model):
         verbose_name_plural = _("ContractTransactionScanTask")
 
     def __str__(self):
-        return u'TransScTsk-' + str(self.id)
+        return f'TransScTsk-{self.id}'
 
 class ContractEventScanTask(models.Model):
     id = models.BigAutoField(primary_key=True)
 
     scan_config = models.ForeignKey(EtherScanConfig, on_delete=models.SET_NULL, null=True,
                                     related_name='RelatedEventScanTask', limit_choices_to={'status': ScanConfigStatusEnum.ENABLE})
-    contract = models.ForeignKey(
-        Contract, on_delete=models.SET_NULL, null=True, related_name='RelatedEventScanTask')
+    contract = models.ForeignKey(Contract, on_delete=models.SET_NULL, null=True, related_name='RelatedEventScanTask')
 
     # 左闭右开
     start_block_id = models.PositiveBigIntegerField("StartBlockId")
@@ -115,7 +114,7 @@ class ContractEventScanTask(models.Model):
         index_together = [['contract', 'status']]
 
     def __str__(self):
-        return u'EventScanTsk-' + str(self.id)
+        return f'EventScanTsk-{self.id}'
 
 class ContractTransaction(models.Model):
     # TODO 索引
@@ -154,7 +153,7 @@ class ContractTransaction(models.Model):
         unique_together = [['transaction_hash', 'function_name']]
 
     def __str__(self):
-        return "ContractTrans-" + str(self.id)
+        return f"ContractTrans-{self.id}"
 
 class ContractEvent(models.Model):
     # TODO 索引
@@ -207,4 +206,4 @@ class ContractEvent(models.Model):
         unique_together = [['transaction_hash', 'log_index']]
 
     def __str__(self):
-        return "ContractEvent-" + str(self.id)
+        return f"ContractEvent-{self.id}"

@@ -4,13 +4,12 @@ import logging
 from typing import Any, Dict, List, Set
 from requests import Request, Session
 import json
-from izumi_infra.blockchain.facade.swapFacade import SwapPriceFacade
 from izumi_infra.blockchain.types import TokenData
 from izumi_infra.blockchain.utils import sort_addr
 
 logger = logging.getLogger(__name__)
 
-class UniswapTokenPriceFacade(SwapPriceFacade):
+class UniswapTokenPriceFacade():
     """
     Token ability facade context
     thegraph playground: https://thegraph.com/hosted-service/subgraph/uniswap/uniswap-v3
@@ -21,48 +20,28 @@ class UniswapTokenPriceFacade(SwapPriceFacade):
     def _init_thegraph_api(self):
         self.thegraph_uniswap3_url = 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3'
         self.thegraph_uniswap2_url = 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2'
-        self.thegraph_uniswap3_token_graphql = """query tokenPrice($mainAddress: String, $targetTokenList: [String]){
-            as0: pools(where: { token0: $mainAddress, token1_in: $targetTokenList }) {
-                feeTier
-                targetPrice: token0Price
-                targetVolume: volumeToken1
-                token: token1 {
-                    id
-                    symbol
-                    name
-                }
+        self.thegraph_uniswap3_token_graphql = """query tokenPrice($targetTokenList: [String]){
+            tokens(where: { id_in: $targetTokenList }) {
+                id
+                derivedETH
             }
-            as1: pools(where: { token1: $mainAddress, token0_in: $targetTokenList }) {
-                feeTier
-                targetPrice: token1Price
-                targetVolume: volumeToken0
-                token: token0 {
-                    id
-                    symbol
-                    name
-                }
+            ethUsdcPool: pools(where: { token0: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                            token1: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"},
+                            orderBy: volumeToken0, orderDirection: desc, first: 1) {
+                ethUSDPrice: token0Price
             }
         }
         """
 
         self.thegraph_uniswap2_token_graphql="""query tokenPrice($mainAddress: String, $targetTokenList: [String]){
-            as0: pairs (where: { token0: $mainAddress, token1_in: $targetTokenList }){
-                targetPrice: token0Price
-                targetVolume: volumeToken0
-                token: token1 {
-                    id
-                    symbol
-                    name
-                }
-            },
-            as1: pairs (where: { token1: $mainAddress, token0_in: $targetTokenList }){
-                targetPrice: token1Price
-                targetVolume: volumeToken1
-                token: token0 {
-                    id
-                    symbol
-                    name
-                }
+            tokens(where: { id_in: $targetTokenList }) {
+                id
+                derivedETH
+            }
+            ethUsdcPool: pairs(where: { token0: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                            token1: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"},
+                            orderBy: volumeToken0, orderDirection: desc, first: 1) {
+                ethUSDPrice: token0Price
             }
         }
         """
@@ -76,63 +55,57 @@ class UniswapTokenPriceFacade(SwapPriceFacade):
     def __init__(self):
         super().__init__()
         self._init_thegraph_api()
-        self.main_usdc_addr = '0x99c9fc46f92e8a1c0dec1b1747d010903e884be1'
-        self.main_weth_addr = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
-        self.main_token_addr_list = [ self.main_usdc_addr, self.main_weth_addr ]
-        self.token_addr_set = set()
+        self.token_price_info = {}
 
-    def sync_uniswap_pool(self, main_token_addr, target_addr_list: List[str], version=3):
+    def fetch_uniswap_token_price(self, target_addr_list: List[str], version=3) -> Dict[str, float]:
         payload = {
             "query": self.thegraph_uniswap3_token_graphql if version == 3 else self.thegraph_uniswap2_token_graphql,
             "variables": {
-                "mainAddress": main_token_addr.lower(),
                 "targetTokenList": [t.lower() for t in target_addr_list]
             }
         }
+        response = None
         try:
             query_url = self.thegraph_uniswap3_url if version == 3 else self.thegraph_uniswap2_url
             response = self.thegraph_uniswap3_session.post(url=query_url, json=payload)
             data = json.loads(response.text)
-            all_token = [*data['data']['as0'], *data['data']['as1']]
+            tokens = data["data"]["tokens"]
+            ethUSDPrice = float(data["data"]["ethUsdcPool"][0]['ethUSDPrice'])
 
-            all_token_info = {}
-            for token in all_token:
-                if float(token['targetVolume']) <= 0: continue
-                token_addr = token['token']['symbol']
-                token['price'] = float(token['targetPrice']) if token_addr > main_token_addr else 1/float(token['targetPrice'])
-                all_token_info.setdefault(token_addr, token)
-                if float(all_token_info[token_addr]['targetVolume']) < float(token['targetVolume']):
-                    all_token_info[token_addr] = token
-
-            for addr, info in all_token_info.items():
-                tokenX, tokenY = sort_addr(main_token_addr, addr)
-                self.set_or_update_pool_price(tokenX, tokenY, info['price'])
-
+            all_token_info = {token['id']: float(token['derivedETH']) * ethUSDPrice for token in tokens}
+            return all_token_info
         except Exception as e:
+            logger.error(f"fetch_uniswap_token_price error, response: {response}")
             logger.exception(e)
             return {}
 
-    def sync_uniswap_pool_all(self, token_addr_list):
-        for main_token_addr in self.main_token_addr_list:
-            self.sync_uniswap_pool(main_token_addr, token_addr_list, version=2)
-            self.sync_uniswap_pool(main_token_addr, token_addr_list)
+    def sync_uniswap_pool_all(self, token_addr_list: List[str]) -> None:
+        """
+        cache missing as 0
+        """
+        logger.info(f'fetch uniswap token price size: {len(token_addr_list)}')
+        v2_info = self.fetch_uniswap_token_price(token_addr_list, version=2)
+        v3_info = self.fetch_uniswap_token_price(token_addr_list)
+        default_info = {addr: 0 for addr in token_addr_list}
+        self.token_price_info = { **default_info , **self.token_price_info, **v2_info, **v3_info}
 
-    def get_token_price_by_addr_list(self, addr_list_param: List[str]):
-        missing_token = set(addr_list_param) - self.token_addr_set
+    def get_token_price_by_addr_list(self, addr_list_param: List[str]) -> Dict[str, float]:
+        param_token_addr_set = set([addr.lower() for addr in addr_list_param])
+        missing_token = param_token_addr_set - self.token_price_info.keys()
         if missing_token:
-            self.token_addr_set = self.token_addr_set.union(missing_token)
-            self.sync_uniswap_pool_all(list(self.token_addr_set))
+            self.sync_uniswap_pool_all(list(missing_token))
 
-        return { t: {'price': self.get_token_usd_price(self.main_usdc_addr, t)} for t in addr_list_param }
+        return { addr: self.token_price_info.get(addr, 0) for addr in param_token_addr_set }
 
-    def get_token_price_by_addr(self, token_addr: str):
-        token_info = self.get_token_price_by_addr_list([token_addr])
-        return token_info
+    def get_token_price_by_addr(self, token_addr: str) -> float:
+        token_addr_lower = token_addr.lower()
+        token_info = self.get_token_price_by_addr_list([token_addr_lower])
+        return token_info.get(token_addr_lower, 0)
 
-    def refresh_cache_token(self):
-        if len(self.token_addr_set) == 0: return
-        logger.info("refresh all cache token balance")
-        self.sync_uniswap_pool_all(list(self.token_addr_set))
+    def refresh_cache_token(self) -> None:
+        if len(self.token_price_info) == 0: return
+        logger.info("UniswapTokenPriceFacade refresh all cache token price")
+        self.sync_uniswap_pool_all(list(self.token_price_info.keys()))
 
 
 class UniswapTokenHourDataFacade():
