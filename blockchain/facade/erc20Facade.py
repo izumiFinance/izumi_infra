@@ -21,13 +21,17 @@ def get_erc20_token_info(chain_id: int, token_addr: str) -> Erc20TokenInfo:
     return Erc20TokenInfo(address=token_addr, symbol=token_symbol, decimals=token_decimals, name=name)
 
 def get_erc20_token_balance(chain_id: int, token_addr: str, account_addr: str) -> float:
-    blockchain = Blockchain.objects.get(chain_id=chain_id)
-    tokenContract = contractHolder.get_facade_by_info(blockchain, to_checksum_address(token_addr), BaseContractInfoEnum.ERC20.abi)
-    balance_decimal = tokenContract.contract.functions.balanceOf(to_checksum_address(account_addr)).call()
-    token_info = get_erc20_token_info(chain_id, token_addr)
+    try:
+        blockchain = Blockchain.objects.get(chain_id=chain_id)
+        tokenContract = contractHolder.get_facade_by_info(blockchain, to_checksum_address(token_addr), BaseContractInfoEnum.ERC20.abi)
+        balance_decimal = tokenContract.contract.functions.balanceOf(to_checksum_address(account_addr)).call()
+        token_info = get_erc20_token_info(chain_id, token_addr)
 
-    return balance_decimal / (10 ** token_info['decimals'])
-
+        return balance_decimal / (10 ** token_info['decimals'])
+    except Exception as e:
+        logger.exception(e)
+        logger.warn(f'get_erc20_token_balance error: {chain_id}, {token_addr}, {account_addr}')
+        raise e
 
 @cached(cache=LRUCache(maxsize=1024))
 def get_erc20_token_hist_balance(chain_id: int, token_addr: str, account_addr: str, block_id: int) -> float:

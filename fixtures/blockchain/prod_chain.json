@@ -22,7 +22,7 @@
       "rpc_url": "https://mainnet.optimism.io/",
       "gas_price_wei": 5000000000,
       "create_time": "2022-01-01T12:00:00",
-      "update_time": "2021-01-01T12:00:00"
+      "update_time": "2022-01-01T12:00:00"
     }
   },
   {
@@ -34,8 +34,8 @@
       "vm_type": "EVM",
       "rpc_url": "https://bsc-dataseed1.binance.org:443",
       "gas_price_wei": 5000000000,
-      "create_time": "2022-01-01T16:14:52.541",
-      "update_time": "2021-01-01T12:00:00"
+      "create_time": "2022-01-01T12:00:00",
+      "update_time": "2022-01-01T12:00:00"
     }
   },
   {
@@ -48,7 +48,7 @@
       "rpc_url": "https://kovan.optimism.io/",
       "gas_price_wei": 5000000000,
       "create_time": "2022-01-01T12:00:00",
-      "update_time": "2021-01-01T12:00:00"
+      "update_time": "2022-01-01T12:00:00"
     }
   },
   {
@@ -60,8 +60,8 @@
       "vm_type": "EVM",
       "rpc_url": "https://data-seed-prebsc-1-s1.binance.org:8545",
       "gas_price_wei": 10000000000,
-      "create_time": "2022-01-21T12:00:00",
-      "update_time": "2021-01-01T12:00:00"
+      "create_time": "2022-01-01T12:00:00",
+      "update_time": "2022-01-01T12:00:00"
     }
   },
   {
@@ -73,8 +73,8 @@
       "vm_type": "EVM",
       "rpc_url": "https://http-mainnet-node.huobichain.com",
       "gas_price_wei": 2500000000,
-      "create_time": "2022-01-11T17:38:07.806",
-      "update_time": "2021-01-01T12:00:00"
+      "create_time": "2022-01-01T12:00:00",
+      "update_time": "2022-01-01T12:00:00"
     }
   },
   {
@@ -86,8 +86,8 @@
       "vm_type": "EVM",
       "rpc_url": "https://rpc-mainnet.maticvigil.com:443",
       "gas_price_wei": 5000000000,
-      "create_time": "2022-01-01T16:15:25.247",
-      "update_time": "2021-01-01T12:00:00"
+      "create_time": "2022-01-01T12:00:00",
+      "update_time": "2022-01-01T12:00:00"
     }
   },
   {
@@ -99,8 +99,21 @@
       "vm_type": "EVM",
       "rpc_url": "https://rpcapi.fantom.network",
       "gas_price_wei": 50000000000,
-      "create_time": "2022-01-01T17:16:00.507",
-      "update_time": "2021-01-01T12:00:00"
+      "create_time": "2022-01-01T12:00:00",
+      "update_time": "2022-01-01T12:00:00"
+    }
+  },
+  {
+    "model": "blockchain.blockchain",
+    "pk": 42161,
+    "fields": {
+      "fullname": "Arbitrum",
+      "symbol": "ARBI",
+      "vm_type": "EVM",
+      "rpc_url": "https://arb1.arbitrum.io/rpc",
+      "gas_price_wei": 50000000000,
+      "create_time": "2022-01-01T12:00:00",
+      "update_time": "2022-01-01T12:00:00"
     }
   }
 ]

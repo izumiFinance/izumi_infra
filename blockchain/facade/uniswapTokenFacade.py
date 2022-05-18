@@ -52,10 +52,11 @@ class UniswapTokenPriceFacade():
         self.thegraph_uniswap3_session = Session()
         self.thegraph_uniswap3_session.headers.update(headers)
 
-    def __init__(self):
+    def __init__(self, enable_v2=False):
         super().__init__()
         self._init_thegraph_api()
         self.token_price_info = {}
+        self.enable_v2 = enable_v2
 
     def fetch_uniswap_token_price(self, target_addr_list: List[str], version=3) -> Dict[str, float]:
         payload = {
@@ -84,7 +85,10 @@ class UniswapTokenPriceFacade():
         cache missing as 0
         """
         logger.info(f'fetch uniswap token price size: {len(token_addr_list)}')
-        v2_info = self.fetch_uniswap_token_price(token_addr_list, version=2)
+        if self.enable_v2:
+            v2_info = self.fetch_uniswap_token_price(token_addr_list, version=2)
+        else:
+            v2_info = {}
         v3_info = self.fetch_uniswap_token_price(token_addr_list)
         default_info = {addr: 0 for addr in token_addr_list}
         self.token_price_info = { **default_info , **self.token_price_info, **v2_info, **v3_info}
