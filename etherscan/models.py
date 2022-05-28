@@ -5,7 +5,7 @@ from django.utils.translation import gettext as _
 
 from izumi_infra.blockchain.models import Blockchain, Contract
 from izumi_infra.etherscan.conf import etherscan_settings
-from izumi_infra.etherscan.constants import (ProcessingStatusEnum,
+from izumi_infra.etherscan.constants import (INIT_SUB_STATUS, ProcessingStatusEnum,
                                              ScanConfigAuditLevelEnum,
                                              ScanConfigStatusEnum,
                                              ScanTaskStatusEnum, ScanTypeEnum,
@@ -136,8 +136,7 @@ class ContractTransaction(models.Model):
     input_data = models.TextField("input")
 
     status = models.SmallIntegerField("ProcessStatusStatus", default=ProcessingStatusEnum.INITIAL, choices=ProcessingStatusEnum.choices())
-    # TODO use bit mask multi receiver
-    # sub_status = models.SmallIntegerField("ProcessSubStatus", default=0)
+    sub_status = models.IntegerField("ProcessSubStatus", default=INIT_SUB_STATUS)
     touch_count_remain = models.IntegerField("TouchCountRemain", default=0)
     create_time = models.DateTimeField("CreateTime", auto_now_add=True)
     # block_time = models.DateTimeField("BlockTime")
@@ -145,6 +144,18 @@ class ContractTransaction(models.Model):
     def update_status(self, status_enum: ProcessingStatusEnum):
         # avoid trigger signal
         ContractTransaction.objects.filter(id=self.id).update(status=status_enum)
+
+    def update_fields(self, **kwargs):
+        # avoid trigger signal
+        ContractTransaction.objects.filter(id=self.id).update(**kwargs)
+
+    def mark_sub_status_success(self, sub_status_bit: int):
+        update_data = {}
+        clean_mask = ~(1 << sub_status_bit)
+        sub_status_after = self.sub_status & clean_mask
+        if sub_status_after == 0: update_data['status'] = ProcessingStatusEnum.PROCESSEDONE
+        update_data['sub_status'] = F('sub_status').bitand(clean_mask)
+        ContractTransaction.objects.filter(id=self.id).update(**update_data)
 
     class Meta:
         verbose_name = _("ContractTransaction")
@@ -177,8 +188,7 @@ class ContractEvent(models.Model):
     data = models.TextField("data")
 
     status = models.SmallIntegerField("ProcessStatus", default=ProcessingStatusEnum.INITIAL, choices=ProcessingStatusEnum.choices())
-    # TODO use bit mask multi receiver
-    # sub_status = models.SmallIntegerField("ProcessSubStatus", default=0)
+    sub_status = models.IntegerField("ProcessSubStatus", default=INIT_SUB_STATUS)
     touch_count_remain = models.IntegerField("TouchCountRemain", default=0)
     create_time = models.DateTimeField("CreateTime", auto_now_add=True)
     # block_time = models.DateTimeField("BlockTime")
@@ -189,15 +199,15 @@ class ContractEvent(models.Model):
 
     def update_fields(self, **kwargs):
         # avoid trigger signal
-        ContractEvent.objects.filter(id=self.id).update(kwargs)
+        ContractEvent.objects.filter(id=self.id).update(**kwargs)
 
-    # def mark_sub_status_success(self, group_enum: SubReceiverGroupEnum):
-    #     update_data = {}
-    #     clean_mask = ~(1 << group_enum.value[1])
-    #     sub_status_after = self.sub_status & clean_mask
-    #     if sub_status_after == 0: update_data['status'] = ProcessingStatusEnum.PROCESSEDONE
-    #     update_data['sub_status'] = F('sub_status') & clean_mask
-    #     ContractEvent.objects.filter(id=self.id).update(**update_data)
+    def mark_sub_status_success(self, sub_status_bit: int):
+        update_data = {}
+        clean_mask = ~(1 << sub_status_bit)
+        sub_status_after = self.sub_status & clean_mask
+        if sub_status_after == 0: update_data['status'] = ProcessingStatusEnum.PROCESSEDONE
+        update_data['sub_status'] = F('sub_status').bitand(clean_mask)
+        ContractEvent.objects.filter(id=self.id).update(**update_data)
 
     class Meta:
         verbose_name = _("ContractEvent")

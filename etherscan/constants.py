@@ -32,6 +32,12 @@ class ScanFilterTypeEnum(StringFieldEnum):
 
 FILTER_SPLIT_CHAR = ','
 
+INIT_SUB_STATUS = -1
+
 class SubReceiverGroupEnum(Enum):
     MAX_2_OF_0 = (2, 0)
     MAX_2_OF_1 = (2, 1)
+
+    MAX_3_OF_0 = (3, 0)
+    MAX_3_OF_1 = (3, 1)
+    MAX_3_OF_2 = (3, 2)

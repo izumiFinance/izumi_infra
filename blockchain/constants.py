@@ -77,6 +77,11 @@ class ERC20TopicEnum(BaseTopicEnum):
     Transfer = 'Transfer'
     Approval = 'Approval'
 
+class ERC721TopicEnum(BaseTopicEnum):
+    Transfer = 'Transfer'
+    Approval = 'Approval'
+    ApprovalForAll = 'ApprovalForAll'
+
 class UniswapNonfungiblePositionManagerTopicEnum(BaseTopicEnum):
     IncreaseLiquidity = 'IncreaseLiquidity'
     DecreaseLiquidity = 'DecreaseLiquidity'

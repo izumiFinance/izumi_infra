@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from enum import Enum
 import logging
-from izumi_infra.etherscan.constants import ProcessingStatusEnum, SubReceiverGroupEnum
+from izumi_infra.etherscan.constants import INIT_SUB_STATUS, ProcessingStatusEnum, SubReceiverGroupEnum
 
 logger = logging.getLogger(__name__)
 
@@ -14,27 +14,31 @@ def entity_filter(contract_type: str, topic: str = None, function_name: str = No
             if topic is not None and instance.topic != topic: return
             if function_name is not None and instance.function_name != function_name: return
             if instance.contract.type != contract_type: return
-            logger.info('detect entity: %s chanage for %s', instance, func.__name__)
+            logger.info(f'detect entity: {instance} chanage for {func.__name__}')
 
             return func(*args, **kwargs)
 
         return wrapper
     return decorator
 
-# def multi_entity_filter(group_enum: SubReceiverGroupEnum, contract_type: str, topic: str = None, function_name: str = None, **kwargs):
-#     def decorator(func):
-#         def wrapper(*args, **kwargs):
-#             instance = kwargs['instance']
-#             if instance.status == ProcessingStatusEnum.PROCESSEDONE: return
-#             if instance.sub_status == 0:
-#                 # TODO netest signal
-#                 instance.update(sub_status=2 ** group_enum[0])
-#             if topic is not None and instance.topic != topic: return
-#             if function_name is not None and instance.function_name != function_name: return
-#             if instance.contract.type != contract_type: return
-#             logger.info('detect entity: %s chanage for %s', instance, func.__name__)
+def multi_entity_filter(group_enum: SubReceiverGroupEnum, contract_type: str, topic: str = None, function_name: str = None, **kwargs):
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            instance = kwargs['instance']
+            if instance.status == ProcessingStatusEnum.PROCESSEDONE: return
+            if instance.sub_status == INIT_SUB_STATUS:
+                # TODO netest signal
+                sub_task_mark = 2**group_enum.value[0] - 1
+                instance.update_fields(sub_status=sub_task_mark)
 
-#             return func(*args, **kwargs)
+            if instance.sub_status & (1 << group_enum.value[1]) == 0: return
 
-#         return wrapper
-#     return decorator
+            if topic is not None and instance.topic != topic: return
+            if function_name is not None and instance.function_name != function_name: return
+            if instance.contract.type != contract_type: return
+            logger.info(f'detect entity: {instance} chanage for sub {func.__name__}')
+
+            return func(*args, **kwargs)
+
+        return wrapper
+    return decorator
