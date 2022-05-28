@@ -1,11 +1,11 @@
 from django.conf import settings
 from django.db import models
-from django.db.models import F
+from django.db.models import F, Case, When
 from django.utils.translation import gettext as _
 
 from izumi_infra.blockchain.models import Blockchain, Contract
 from izumi_infra.etherscan.conf import etherscan_settings
-from izumi_infra.etherscan.constants import (INIT_SUB_STATUS, ProcessingStatusEnum,
+from izumi_infra.etherscan.constants import (INIT_SUB_STATUS, MAX_SUB_STATUS_BIT, ProcessingStatusEnum,
                                              ScanConfigAuditLevelEnum,
                                              ScanConfigStatusEnum,
                                              ScanTaskStatusEnum, ScanTypeEnum,
@@ -136,7 +136,7 @@ class ContractTransaction(models.Model):
     input_data = models.TextField("input")
 
     status = models.SmallIntegerField("ProcessStatusStatus", default=ProcessingStatusEnum.INITIAL, choices=ProcessingStatusEnum.choices())
-    sub_status = models.IntegerField("ProcessSubStatus", default=INIT_SUB_STATUS)
+    sub_status = models.SmallIntegerField("ProcessSubStatus", default=INIT_SUB_STATUS)
     touch_count_remain = models.IntegerField("TouchCountRemain", default=0)
     create_time = models.DateTimeField("CreateTime", auto_now_add=True)
     # block_time = models.DateTimeField("BlockTime")
@@ -151,9 +151,12 @@ class ContractTransaction(models.Model):
 
     def mark_sub_status_success(self, sub_status_bit: int):
         update_data = {}
-        clean_mask = ~(1 << sub_status_bit)
-        sub_status_after = self.sub_status & clean_mask
-        if sub_status_after == 0: update_data['status'] = ProcessingStatusEnum.PROCESSEDONE
+        set_mask = 1 << sub_status_bit
+        clean_mask = MAX_SUB_STATUS_BIT ^ set_mask
+        update_data['status'] = Case(
+            When(sub_status__exact=set_mask, then=ProcessingStatusEnum.PROCESSEDONE),
+            default=ProcessingStatusEnum.INITIAL
+        )
         update_data['sub_status'] = F('sub_status').bitand(clean_mask)
         ContractTransaction.objects.filter(id=self.id).update(**update_data)
 
@@ -203,9 +206,12 @@ class ContractEvent(models.Model):
 
     def mark_sub_status_success(self, sub_status_bit: int):
         update_data = {}
-        clean_mask = ~(1 << sub_status_bit)
-        sub_status_after = self.sub_status & clean_mask
-        if sub_status_after == 0: update_data['status'] = ProcessingStatusEnum.PROCESSEDONE
+        set_mask = 1 << sub_status_bit
+        clean_mask = MAX_SUB_STATUS_BIT ^ set_mask
+        update_data['status'] = Case(
+            When(sub_status__exact=set_mask, then=ProcessingStatusEnum.PROCESSEDONE),
+            default=ProcessingStatusEnum.INITIAL
+        )
         update_data['sub_status'] = F('sub_status').bitand(clean_mask)
         ContractEvent.objects.filter(id=self.id).update(**update_data)
 

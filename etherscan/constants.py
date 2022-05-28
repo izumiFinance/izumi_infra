@@ -33,6 +33,8 @@ class ScanFilterTypeEnum(StringFieldEnum):
 FILTER_SPLIT_CHAR = ','
 
 INIT_SUB_STATUS = -1
+# small signed int max 15 bit
+MAX_SUB_STATUS_BIT = 0xFF
 
 class SubReceiverGroupEnum(Enum):
     MAX_2_OF_0 = (2, 0)
