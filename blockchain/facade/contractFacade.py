@@ -2,20 +2,22 @@
 import logging
 from functools import reduce
 import json
-from typing import List, Set
+from typing import Dict, List, Set, Tuple, Type, TypeVar
+from unittest import result
 import eth_event
 from eth_typing.encoding import HexStr
 
 from eth_utils import encode_hex, event_abi_to_log_topic
+from hexbytes import HexBytes
 from web3.datastructures import AttributeDict
-from web3.types import EventData, TxData
+from web3.types import EventData, TxData, TxReceipt
 from izumi_infra.blockchain.constants import ZERO_ADDRESS
 from izumi_infra.blockchain.facade import BlockchainFacade
-from izumi_infra.utils.collection_util import merge_dict_in_list
+from izumi_infra.utils.collection_util import merge_dict_in_list, tuple_to_typedict
 
 logger = logging.getLogger(__name__)
 
-
+T = TypeVar('T')
 
 class ContractFacade():
     """
@@ -119,8 +121,48 @@ class ContractFacade():
     def decode_trans_input(self, input_raw_data: HexStr):
         return self.contract.decode_function_input(input_raw_data)
 
-    def get_lastest_block_number(self):
-        return self.blockchainFacade.get_lastest_block_number()
+    def find_fn_trans_input(self, input_raw_data: HexStr, target_fn_name: str, type_class: Type[T]) -> T:
+        """
+        support multicall
+        """
+        input_data = self.contract.decode_function_input(input_raw_data)
+        fn_name: str = input_data[0].fn_name
+        input_param: Dict = input_data[1]
+        if fn_name == target_fn_name:
+            # type_class name should be input param name
+            if len(input_param.keys()) == 1 and list(input_param.keys())[0].lower() == type_class.__name__.lower():
+                return tuple_to_typedict(list(input_param.values())[0], type_class)
+            return input_param
+        elif fn_name.lower() == 'multicall':
+            multicall_data_list = input_param['data']
+            for single_call in multicall_data_list:
+                result = self.find_fn_trans_input(single_call, target_fn_name, type_class)
+                if result is not None: return result
+
+        return None
+
+    def get_latest_block_number(self):
+        return self.blockchainFacade.get_latest_block_number()
 
     def get_transaction_by_tx_hash(self, tx_hash: str):
         return self.blockchainFacade.get_transaction_by_tx_hash(tx_hash)
+
+    def get_events_by_tx_hash(self, tx_hash: str) -> List[Tuple[str, int, Dict]]:
+        transaction_receipt = self.blockchainFacade.get_transaction_receipt_by_tx_hash(tx_hash)
+        return self.decode_events_from_transaction_receipt(transaction_receipt)
+
+    def decode_events_from_transaction_receipt(self, transaction_receipt: TxReceipt) -> List[Tuple[str, int, Dict]]:
+        event_list = []
+        for log in transaction_receipt.get('logs', []):
+            topic_key = HexBytes(log["topics"][0]).hex()
+            topic_name = self.topic_to_topic_name_mapping.get(topic_key, None)
+            if topic_name is None: continue
+            if log['address'].lower() != self.contract_address.lower(): continue
+            try:
+                event_data = self.decode_event_log(log)
+                event_list.append((topic_name, log['logIndex'], event_data))
+            except Exception as e:
+                logger.error(f'error decode: {log}')
+                logger.exception(e)
+
+        return event_list

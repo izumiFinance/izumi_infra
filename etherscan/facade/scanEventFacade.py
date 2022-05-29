@@ -60,7 +60,7 @@ def add_event_scan_task(event_scan_config: EtherScanConfig):
 
     contract_facade = contractHolder.get_facade_by_model(event_contract)
 
-    block_id_now = contract_facade.get_lastest_block_number()
+    block_id_now = contract_facade.get_latest_block_number()
     end_block_id = block_id_now - event_scan_config.stable_block_offset
     last_task = ContractEventScanTask.objects.filter(contract=event_contract).order_by('-end_block_id').first()
     start_block_id = last_task.end_block_id if last_task else max(end_block_id - etherscan_settings.TASK_BATCH_SCAN_BLOCK, 0)

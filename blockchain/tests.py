@@ -19,7 +19,7 @@ class BlockchainTests(TestCase):
         self.assertTrue(self.blockchain_facade.is_connected())
 
     def testLatestBlock(self):
-        self.assertNotEqual(self.blockchain_facade.get_lastest_block_number(), 0)
+        self.assertNotEqual(self.blockchain_facade.get_latest_block_number(), 0)
 
     def testConextGet(self):
         blockchain_model = Blockchain.objects.first()

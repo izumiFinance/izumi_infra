@@ -5,7 +5,7 @@ from eth_typing.encoding import HexStr
 from web3 import Web3
 from web3.contract import Contract
 from web3.middleware import geth_poa_middleware
-from web3.types import TxData
+from web3.types import TxData, TxReceipt
 
 from izumi_infra.blockchain.constants import BlockChainVmEnum
 from izumi_infra.blockchain.types import ContractMeta, TokenInfo
@@ -38,7 +38,7 @@ class BlockchainFacade():
     def init_contract(self, contract_address: str, abi_json_str: str) -> Type[Contract]:
         return self.w3.eth.contract(address=contract_address, abi=abi_json_str)
 
-    def get_lastest_block_number(self) -> int:
+    def get_latest_block_number(self) -> int:
         return self.w3.eth.get_block('latest')['number']
 
     def get_event_logs(self, from_block: int, to_block: int, contract_address: str, topics: List[HexStr]):
@@ -86,3 +86,6 @@ class BlockchainFacade():
 
     def build_contract(self, address: str, abi: str) -> Contract:
         return self.w3.eth.contract(address=address, abi=abi)
+
+    def get_transaction_receipt_by_tx_hash(self, tx_hash: str) -> TxReceipt:
+        return self.w3.eth.get_transaction_receipt(tx_hash)

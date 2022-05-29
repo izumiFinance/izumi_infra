@@ -54,7 +54,7 @@ def add_trans_scan_task(trans_scan_config: EtherScanConfig):
     trans_contract = trans_scan_config.contract
     contract_facade = contractHolder.get_facade_by_model(trans_contract)
 
-    block_id_now = contract_facade.get_lastest_block_number()
+    block_id_now = contract_facade.get_latest_block_number()
     end_block_id = block_id_now - trans_scan_config.stable_block_offset
     last_task = ContractTransactionScanTask.objects.filter(contract=trans_contract).order_by('-end_block_id').first()
     start_block_id = last_task.end_block_id if last_task else max(end_block_id - etherscan_settings.TASK_BATCH_SCAN_BLOCK, 0)
