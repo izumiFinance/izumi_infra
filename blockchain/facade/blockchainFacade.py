@@ -8,7 +8,8 @@ from web3.middleware import geth_poa_middleware
 from web3.types import TxData, TxReceipt
 
 from izumi_infra.blockchain.constants import BlockChainVmEnum
-from izumi_infra.blockchain.types import ContractMeta, TokenInfo
+from izumi_infra.blockchain.types import ContractMeta
+from izumi_infra.blockchain.conf import blockchain_settings
 from izumi_infra.etherscan.conf import etherscan_settings
 from izumi_infra.utils.collection_util import chunks
 from izumi_infra.utils.exceptions import NoEntriesFound
@@ -27,7 +28,7 @@ class BlockchainFacade():
         self.gas_price_wei = gas_price_wei
 
         if vm_type == BlockChainVmEnum.EVM:
-            self.w3 = Web3(Web3.HTTPProvider(self.rpc_url))
+            self.w3 = Web3(Web3.HTTPProvider(self.rpc_url, request_kwargs={'timeout': blockchain_settings.WEB3_HTTP_RPC_TIMEOUT}))
             self.w3.middleware_onion.inject(geth_poa_middleware, layer=0)
         else:
             raise NoEntriesFound("No matching entries for '{}'".format(chain_symbol))
