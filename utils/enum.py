@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from enum import Enum, IntEnum
-from typing import List
+from typing import List, Type, TypeVar, TypedDict
 
 class StringEnum(Enum):
     def __str__(self) -> str:
@@ -44,3 +44,14 @@ class IntegerFieldEnum(IntegerEnum):
 
     def __hash__(self) -> int:
         return self.value
+
+T = TypeVar('T')
+
+def LinkTypeToEnum(*enum_value) -> T:
+    """
+    just for link jump
+    """
+    def _wrapper(type_class: Type[T]) -> T:
+        return type_class
+
+    return _wrapper
