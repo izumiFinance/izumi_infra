@@ -31,7 +31,7 @@ def token_config_loader(url: str) -> TokenConfigType:
         data: List[GithubTokenConfig] = json.loads(response.text)
     except Exception as e:
         logger.exception(e)
-        logger.error(f'token_config_loader error, response: {response}')
+        logger.error(f'token_config_loader error, response: {response.content}')
 
     all_token_config: TokenConfigType = {}
     for tokenConfig in data:

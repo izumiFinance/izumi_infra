@@ -76,7 +76,7 @@ class UniswapTokenPriceFacade():
             all_token_info = {token['id']: float(token['derivedETH']) * ethUSDPrice for token in tokens}
             return all_token_info
         except Exception as e:
-            logger.error(f"fetch_uniswap_token_price error, response: {response}")
+            logger.error(f"fetch_uniswap_token_price error, response: {response.content}")
             logger.exception(e)
             return {}
 
@@ -181,7 +181,7 @@ class UniswapTokenHourDataFacade():
             return result
 
         except Exception as e:
-            logger.error(f"get_token_data_hour error, response: {response}")
+            logger.error(f"get_token_data_hour error, response: {response.content}")
             logger.exception(e)
             return {}
 

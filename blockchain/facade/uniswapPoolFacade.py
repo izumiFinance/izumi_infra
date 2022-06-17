@@ -77,7 +77,7 @@ class UniswapPoolFacade(BaseContext):
             response = self.thegraph_uniswap3_session.post(url=query_url, json=payload)
             return json.loads(response.text)['data']['poolDayDatas'][0]
         except Exception as e:
-            logger.error(f'query_latest_pool_data error response: {response}')
+            logger.error(f'query_latest_pool_data error response: {response.content}')
             logger.exception(e)
             return {}
 
