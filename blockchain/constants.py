@@ -5,6 +5,7 @@ from izumi_infra.utils.enum import StringFieldEnum, IntegerFieldEnum
 from izumi_infra.utils import abiJsonLoader
 
 ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
+ONE_ADDRESS = '0x0000000000000000000000000000000000000001'
 
 class BlockChainVmEnum(StringFieldEnum):
     EVM = "EVM"

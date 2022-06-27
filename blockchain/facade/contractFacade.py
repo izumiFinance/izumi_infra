@@ -123,7 +123,7 @@ class ContractFacade():
 
     def find_fn_trans_input(self, input_raw_data: HexStr, target_fn_name: str, type_class: Type[T]) -> T:
         """
-        support multicall
+        support multicall(bytes[])
         """
         input_data = self.contract.decode_function_input(input_raw_data)
         fn_name: str = input_data[0].fn_name
@@ -152,6 +152,9 @@ class ContractFacade():
         return self.decode_events_from_transaction_receipt(transaction_receipt)
 
     def decode_events_from_transaction_receipt(self, transaction_receipt: TxReceipt) -> List[Tuple[str, int, Dict]]:
+        """
+        return data: [(topicName, logIndex, event_data),]
+        """
         event_list = []
         for log in transaction_receipt.get('logs', []):
             topic_key = HexBytes(log["topics"][0]).hex()

@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
-from asyncio.log import logger
-from datetime import datetime
-import os
 import logging
+import os
+from datetime import datetime
+
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandParser
 
+logger = logging.getLogger(__name__)
 
 class Command(BaseCommand):
     help = 'Generate python type dict class define file from contract abi'
