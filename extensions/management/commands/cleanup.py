@@ -9,7 +9,7 @@ from django.core import management
 import MySQLdb as Database
 
 class Command(BaseCommand):
-    help = 'Remove migrations file, rm db and tables, execute makemirgations and migrate, loaddata from fixtrues'
+    help = 'Remove migrations file, rm db and tables, execute makemirgations and migrate, loaddata from fixtures'
 
     def handle(self, *args, **options):
         db_info = settings.DATABASES.get('default')

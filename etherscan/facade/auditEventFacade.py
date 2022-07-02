@@ -27,7 +27,7 @@ def audit_event_entry(audit_start_datetime: datetime, audit_slice_hours=24):
 
     start_time = audit_start_datetime.replace(minute=0, second=0, microsecond=0)
     end_time = start_time + timedelta(hours=audit_slice_hours)
-    logger.info("start audit event: [%s, %s)", start_time, end_time)
+    logger.info(f"start audit event: [{start_time}, {end_time})")
 
     timestamp_range_partion = list(chunks(range(int(start_time.timestamp()), int(end_time.timestamp())), merge_min * 60))
     merge_slice_tuple_partion = list(map(lambda t: (datetime.fromtimestamp(t.start), datetime.fromtimestamp(t.stop)), timestamp_range_partion))

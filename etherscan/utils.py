@@ -14,7 +14,7 @@ def entity_filter(contract_type: str, topic: str = None, function_name: str = No
             if topic is not None and instance.topic != topic: return
             if function_name is not None and instance.function_name != function_name: return
             if instance.contract.type != contract_type: return
-            logger.info(f'detect entity: {instance} chanage for {func.__name__}')
+            logger.info(f'detect entity: {instance} change for {func.__name__}')
 
             return func(*args, **kwargs)
 
@@ -27,7 +27,7 @@ def multi_entity_filter(group_enum: SubReceiverGroupEnum, contract_type: str, to
             instance = kwargs['instance']
             if instance.status == ProcessingStatusEnum.PROCESSEDONE: return
             if instance.sub_status == INIT_SUB_STATUS:
-                # TODO netest signal
+                # TODO nested signal
                 sub_task_mark = 2**group_enum.value[0] - 1
                 instance.update_fields(sub_status=sub_task_mark)
 
@@ -36,7 +36,7 @@ def multi_entity_filter(group_enum: SubReceiverGroupEnum, contract_type: str, to
             if topic is not None and instance.topic != topic: return
             if function_name is not None and instance.function_name != function_name: return
             if instance.contract.type != contract_type: return
-            logger.info(f'detect entity: {instance} chanage for sub {func.__name__}')
+            logger.info(f'detect entity: {instance} change for sub {func.__name__}')
 
             return func(*args, **kwargs)
 

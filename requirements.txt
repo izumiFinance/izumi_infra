@@ -1,8 +1,13 @@
+# base
 Django == 3.2.4
 djangorestframework == 3.12.4
+
+# client
 redis == 3.5.3
 mysqlclient == 2.0.3
 django-redis == 5.0.0
+
+# celery
 celery == 5.1.1
 django_celery_beat == 2.2.0
 celery-once == 3.0.1
@@ -17,3 +22,4 @@ eth-event == 1.2.3
 # lib
 intervaltree==3.1.0
 cachetools==5.0.0
+django-simple-captcha==0.5.14

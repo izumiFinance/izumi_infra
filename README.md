@@ -55,15 +55,75 @@ IZUMI_INFRA_BLOCKCHAIN = {
 #### blockchain conf & fixture
 
 support change default conf by set new object named `IZUMI_INFRA_BLOCKCHAIN`, or set env variable, see
-`src/izumi_infra/blockchain/conf.py` for detail.
-
+`izumi_infra/blockchain/conf.py` for detail.
 
 ### etherscan
 
 #### etherscan conf
 
 support change default conf by set new object named `IZUMI_INFRA_ETHERSCAN`, or set env variable, see
-`src/izumi_infra/etherscan/conf.py` for detail.
+`izumi_infra/etherscan/conf.py` for detail.
+
+### extensions
+
+### admin login ip limit and captcha
+
+add izumi_infra.extensions at your INSTALLED_APPS.
+
+```py
+# add izumi_infra/extensions/templates to TEMPLATES.DIRS
+TEMPLATES = [
+    {
+        ...
+        'DIRS': [os.path.join(BASE_DIR, "templates/"), os.path.join(BASE_DIR, "../izumi_infra/extensions/templates/")],
+        ...
+    },
+]
+
+# add url to your project url setting
+urlpatterns = [
+    ...
+    path('', include('izumi_infra.extensions.urls')),
+]
+
+# custom your Captcha conf, ref: https://django-simple-captcha.readthedocs.io/en/latest/
+# like math captcha
+CAPTCHA_IMAGE_SIZE = (80, 45)
+CAPTCHA_LENGTH = 6
+CAPTCHA_TIMEOUT = 1
+
+CAPTCHA_OUTPUT_FORMAT = '%(image)s %(text_field)s %(hidden_field)s '
+CAPTCHA_NOISE_FUNCTIONS = (
+    'captcha.helpers.noise_null',
+    'captcha.helpers.noise_arcs',
+    'captcha.helpers.noise_dots',
+)
+CAPTCHA_CHALLENGE_FUNCT = 'captcha.helpers.math_challenge'
+
+```
+
+Then you may add nginx config like below, if you use nginx.
+
+```conf
+location ^~ /admin/ {
+    proxy_set_header Host $proxy_host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header x-forwarded-for $proxy_add_x_forwarded_for;
+    proxy_pass ...
+}
+```
+
+limit ip and admin site title conf see `izumi_infra/extensions/conf.py`.
+
+### django manage commands
+
+features:
+
+- `abitypegen` generate typing files of Python by Contract abi file
+- `backupdb` backup database as sql file
+- `cleanup` reset database for django project initial
+- `loaddatax` load fixtures data with ignore
+- `sqldiff` show different of schema between database and django model
 
 ### utils
 

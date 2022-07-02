@@ -3,16 +3,15 @@ import json
 import logging
 from typing import Any, Dict, List, Tuple
 
-from web3.datastructures import AttributeDict
-from izumi_infra.blockchain.context import contractHolder
-
 from django.db.utils import IntegrityError
-from django.conf import settings
 
+from izumi_infra.blockchain.context import contractHolder
 from izumi_infra.etherscan.conf import etherscan_settings
-from izumi_infra.blockchain.models import Contract
-from izumi_infra.etherscan.constants import FILTER_SPLIT_CHAR, ScanConfigStatusEnum, ScanFilterTypeEnum, ScanTaskStatusEnum, ScanTypeEnum
-from izumi_infra.etherscan.models import ContractEvent, ContractEventScanTask, EtherScanConfig
+from izumi_infra.etherscan.constants import (FILTER_SPLIT_CHAR,
+                                             ScanConfigStatusEnum,
+                                             ScanTaskStatusEnum, ScanTypeEnum)
+from izumi_infra.etherscan.models import (ContractEvent, ContractEventScanTask,
+                                          EtherScanConfig)
 from izumi_infra.etherscan.types import EventExtra, EventExtraData
 from izumi_infra.utils.collection_util import chunks
 
@@ -140,8 +139,8 @@ def insert_contract_event(unfinished_task: ContractEventScanTask, event_extra: L
             ContractEvent.objects.create(**event_record)
         except IntegrityError:
             # TODO 除了约束冲突，其他情况梳理
-            logger.warn('ignore duplicate event, block: %d, hash: %s, logIndex: %d, topic: %s',
-                        event_record['block_number'], event_record['block_hash'], event_record['log_index'], event_record['topic'])
+            logger.warn(f'ignore duplicate event, block: {event_record["block_number"]}, ' \
+                        f'hash: {event_record["block_hash"]}, logIndex: {event_record["log_index"]}, topic: {event_record["topic"]}')
         except Exception as e:
             failed_count = failed_count + 1
             logger.exception(e)

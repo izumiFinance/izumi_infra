@@ -133,8 +133,8 @@ def insert_contract_transactions(unfinished_task :ContractTransactionScanTask, t
             ContractTransaction.objects.create(**trans_record)
         except IntegrityError:
             # TODO 除了约束冲突，其他情况梳理
-            logger.warn('ignore duplicate block: %d, trans: %s, transIndex: %d',
-                        trans['blockNumber'], trans['hash'].hex(), trans['transactionIndex'])
+            logger.warn(f'ignore duplicate block: {trans["blockNumber"]}, '\
+                f'trans: {trans["hash"].hex()}, transIndex: {trans["transactionIndex"]}')
         except Exception as e:
             failed_count = failed_count + 1
             logger.exception(e)

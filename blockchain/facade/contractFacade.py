@@ -26,7 +26,7 @@ class ContractFacade():
 
     def __init__(self, blockchainFacadeInst: BlockchainFacade, contract_abi_json_str: str, contract_address: str) -> None:
         if not isinstance(blockchainFacadeInst, BlockchainFacade):
-            logger.info("BlockchainFacade instance maybe wrong or unconnected: %s", blockchainFacadeInst)
+            logger.info(f"BlockchainFacade instance maybe wrong or unconnected: {blockchainFacadeInst}")
             raise ValueError("not validate BlockchainFacade instance")
 
         self.blockchainFacade = blockchainFacadeInst

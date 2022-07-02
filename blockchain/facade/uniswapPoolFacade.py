@@ -86,7 +86,7 @@ class UniswapPoolFacade(BaseContext):
         result = self.query_latest_pool_data(chain_id, pool_address)
         # Fake value
         if not result:
-            logger.info("use fake pool data for chainId: %d, pool_addr: %s", chain_id, pool_address)
+            logger.info(f"use fake pool data for chainId: {chain_id}, pool_addr: {pool_address}")
             return {
                 'apr': 1
             }
