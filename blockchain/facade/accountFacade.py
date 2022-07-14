@@ -12,7 +12,7 @@ from web3.types import TxParams
 
 from izumi_infra.blockchain.facade import BlockchainFacade
 from izumi_infra.blockchain.conf import blockchain_settings
-from izumi_infra.blockchain.models import TranscationSignInfo
+from izumi_infra.blockchain.models import TransactionSignInfo
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +39,7 @@ class AccountFacade():
         while True:
             signed_trans = self.blockchainFacade.w3.eth.account.sign_transaction(data, self.private_key)
             r_hex_str = remove_0x_prefix(to_hex(signed_trans.r)).lower()
-            sign_info = TranscationSignInfo(r_hex=r_hex_str)
+            sign_info = TransactionSignInfo(r_hex=r_hex_str)
             if sign_info.insert():
                 break
             else:

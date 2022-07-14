@@ -61,9 +61,9 @@ def add_trans_scan_task(trans_scan_config: EtherScanConfig):
 
     if start_block_id >= end_block_id: return []
 
-    block_range_partion = list(chunks(range(start_block_id, end_block_id), etherscan_settings.TASK_BATCH_SCAN_BLOCK))
+    block_range_partition = list(chunks(range(start_block_id, end_block_id), etherscan_settings.TASK_BATCH_SCAN_BLOCK))
     new_trans_scan_task = list(map(lambda br:  ContractTransactionScanTask(scan_config=trans_scan_config , contract=trans_contract,
-                                        start_block_id=br.start, end_block_id=br.stop), block_range_partion))
+                                        start_block_id=br.start, end_block_id=br.stop), block_range_partition))
 
     ContractTransactionScanTask.objects.bulk_create(new_trans_scan_task)
     return new_trans_scan_task

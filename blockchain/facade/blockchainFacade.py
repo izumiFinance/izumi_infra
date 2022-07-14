@@ -48,10 +48,10 @@ class BlockchainFacade():
     # https://docs.alchemy.com/alchemy/guides/eth_getlogs#making-a-request-to-eth-get-logs
     # A note on specifying topic filters
     def get_all_event_logs(self, from_block: int, to_block: int, contract_addr_list: List[str], topics: List[HexStr]):
-        block_range_partion = list(chunks(range(from_block, to_block), etherscan_settings.ETH_MAX_SCAN_BLOCK))
+        block_range_partition = list(chunks(range(from_block, to_block), etherscan_settings.ETH_MAX_SCAN_BLOCK))
         all_info = []
-        if from_block == to_block: block_range_partion = [range(from_block, to_block)]
-        for block_range in block_range_partion:
+        if from_block == to_block: block_range_partition = [range(from_block, to_block)]
+        for block_range in block_range_partition:
             event_logs = self.w3.eth.get_logs({
                 'fromBlock': block_range.start,
                 'toBlock': block_range.stop,

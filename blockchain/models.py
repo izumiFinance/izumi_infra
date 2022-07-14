@@ -83,7 +83,7 @@ class AccountContractRelationship(models.Model):
     def __str__(self):
         return f"{self.account} <--{self.relation_type}--> {self.contract}"
 
-class TranscationSignInfo(models.Model):
+class TransactionSignInfo(models.Model):
     # 32 byte, 64 hex, add 0x then 66
     r_hex = models.CharField("rHex", unique=True, max_length=66)
     create_time = models.DateTimeField("CreateTime", auto_now_add=True)
@@ -96,8 +96,8 @@ class TranscationSignInfo(models.Model):
             return False
 
     class Meta:
-        verbose_name = _("TranscationSignInfo")
-        verbose_name_plural = _("TranscationSignInfo")
+        verbose_name = _("TransactionSignInfo")
+        verbose_name_plural = _("TransactionSignInfo")
 
     def __str__(self):
         return self.r_hex[:8]

@@ -30,10 +30,10 @@ def audit_trans_entry(audit_start_datetime: datetime, audit_slice_hours=24):
     end_time = start_time + timedelta(hours=audit_slice_hours)
     logger.info(f"start audit trans: [{start_time}, {end_time})")
 
-    timestamp_range_partion = list(chunks(range(int(start_time.timestamp()), int(end_time.timestamp())), merge_min * 60))
-    merge_slice_tuple_partion = list(map(lambda t: (datetime.fromtimestamp(t.start), datetime.fromtimestamp(t.stop)), timestamp_range_partion))
+    timestamp_range_partition = list(chunks(range(int(start_time.timestamp()), int(end_time.timestamp())), merge_min * 60))
+    merge_slice_tuple_partition = list(map(lambda t: (datetime.fromtimestamp(t.start), datetime.fromtimestamp(t.stop)), timestamp_range_partition))
 
-    for merge_slice_tuple in merge_slice_tuple_partion:
+    for merge_slice_tuple in merge_slice_tuple_partition:
         try:
             merge_trans_scan_tasks(merge_slice_tuple[0], merge_slice_tuple[1])
         except Exception as e:

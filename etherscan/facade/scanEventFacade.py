@@ -66,9 +66,9 @@ def add_event_scan_task(event_scan_config: EtherScanConfig):
 
     if start_block_id >= end_block_id: return []
 
-    block_range_partion = list(chunks(range(start_block_id, end_block_id), etherscan_settings.TASK_BATCH_SCAN_BLOCK))
+    block_range_partition = list(chunks(range(start_block_id, end_block_id), etherscan_settings.TASK_BATCH_SCAN_BLOCK))
     new_event_scan_task = list(map(lambda br:  ContractEventScanTask(scan_config=event_scan_config, contract=event_contract,
-                                        start_block_id=br.start, end_block_id=br.stop), block_range_partion))
+                                        start_block_id=br.start, end_block_id=br.stop), block_range_partition))
 
     ContractEventScanTask.objects.bulk_create(new_event_scan_task)
     return new_event_scan_task
@@ -114,7 +114,7 @@ def scan_event_by_task(unfinished_task: ContractEventScanTask) -> List[EventExtr
 
 def insert_contract_event(unfinished_task: ContractEventScanTask, event_extra: List[EventExtra]) -> bool:
     """
-    Insert event logs scanned in blockchian event which topic is OrderCreated
+    Insert event logs scanned in blockchain event which topic is OrderCreated
     """
     failed_count = 0
     contract_facade = contractHolder.get_facade_by_model(unfinished_task.contract)

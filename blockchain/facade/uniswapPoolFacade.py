@@ -60,8 +60,8 @@ class UniswapPoolFacade(BaseContext):
         """
 
     def query_latest_pool_data(self, chain_id: int, pool_address: str) -> UniswapPoolData:
-        lasest_day = datetime.now() - timedelta(days=1)
-        daytime = lasest_day.replace(hour=8, minute=0, second=0, microsecond=0)
+        latest_day = datetime.now() - timedelta(days=1)
+        daytime = latest_day.replace(hour=8, minute=0, second=0, microsecond=0)
         payload = {
             "query": self.thegraph_uniswap3_poolDayData_before,
             "variables": {

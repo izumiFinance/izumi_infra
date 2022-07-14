@@ -2,7 +2,7 @@
 from django.contrib import admin
 
 from izumi_infra.blockchain.models import (Blockchain, Contract, AccountContractRelationship,
-    Account, TranscationSignInfo)
+    Account, TransactionSignInfo)
 
 # Register your models here.
 
@@ -29,7 +29,7 @@ class AccountContractRelationshipAdmin(admin.ModelAdmin):
     readonly_fields = ['create_time', 'update_time']
 
 
-@admin.register(TranscationSignInfo)
-class TranscationSignInfoAdmin(admin.ModelAdmin):
+@admin.register(TransactionSignInfo)
+class TransactionSignInfoAdmin(admin.ModelAdmin):
     actions = []
     list_display = ['__str__', 'r_hex', 'create_time']

@@ -80,7 +80,7 @@ TEMPLATES = [
     },
 ]
 
-# add url to your project url setting
+# add url to your root project url setting, remind add this path to your admin nginx proxy
 urlpatterns = [
     ...
     path('', include('izumi_infra.extensions.urls')),

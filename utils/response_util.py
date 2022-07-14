@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from http import HTTPStatus
 import logging
 from enum import Enum
 
@@ -21,7 +22,7 @@ class ResponseUtil(Response):
     def __init__(self, is_success: bool, data=None, is_idempotent: bool=False, total: int=-1,
                        error_code: str=None, error_msg: str=None, debug_msg: str=None):
         if debug_msg and not settings.DEBUG:
-            logger.exception(f"{debug_msg}")
+            logger.info(f"{debug_msg}")
 
         content = {
                     "is_success": is_success,
@@ -32,7 +33,7 @@ class ResponseUtil(Response):
                     "total": total,
                   }
         if settings.DEBUG: content["debug_msg"] = debug_msg
-        super(ResponseUtil, self).__init__(content, 200)
+        super(ResponseUtil, self).__init__(content, HTTPStatus.OK.value)
 
     def to_jsonresponse(self):
         return JsonResponse(data=self.data)
