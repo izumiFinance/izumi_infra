@@ -26,16 +26,16 @@ def multi_entity_filter(group_enum: SubReceiverGroupEnum, contract_type: str, to
         def wrapper(*args, **kwargs):
             instance = kwargs['instance']
             if instance.status == ProcessingStatusEnum.PROCESSEDONE: return
+            if topic is not None and instance.topic != topic: return
+            if function_name is not None and instance.function_name != function_name: return
+            if instance.contract.type != contract_type: return
+
             if instance.sub_status == INIT_SUB_STATUS:
                 # TODO nested signal
                 sub_task_mark = 2**group_enum.value[0] - 1
                 instance.update_fields(sub_status=sub_task_mark)
 
             if instance.sub_status & (1 << group_enum.value[1]) == 0: return
-
-            if topic is not None and instance.topic != topic: return
-            if function_name is not None and instance.function_name != function_name: return
-            if instance.contract.type != contract_type: return
             logger.info(f'detect entity: {instance} change for sub {func.__name__}')
 
             return func(*args, **kwargs)

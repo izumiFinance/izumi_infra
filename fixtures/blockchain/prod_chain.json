@@ -115,5 +115,18 @@
       "create_time": "2022-01-01T12:00:00",
       "update_time": "2022-01-01T12:00:00"
     }
+  },
+  {
+    "model": "blockchain.blockchain",
+    "pk": 1313161554,
+    "fields": {
+      "fullname": "Aurora",
+      "symbol": "AURORA",
+      "vm_type": "EVM",
+      "rpc_url": "https://mainnet.aurora.dev",
+      "gas_price_wei": 50000000000,
+      "create_time": "2022-01-01T12:00:00",
+      "update_time": "2022-01-01T12:00:00"
+    }
   }
 ]
