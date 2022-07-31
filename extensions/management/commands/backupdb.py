@@ -23,7 +23,7 @@ class Command(BaseCommand):
         user = db_info.get('USER')
         password = db_info.get('PASSWORD')
 
-        main_args = ['--column-statistics=0']
+        main_args = []
         main_args.append('--databases %s' % database_name)
         main_args.append('--user=%s' % user)
 

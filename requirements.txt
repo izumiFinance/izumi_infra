@@ -23,3 +23,4 @@ eth-event == 1.2.3
 intervaltree==3.1.0
 cachetools==5.0.0
 django-simple-captcha==0.5.14
+pygments
