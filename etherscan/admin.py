@@ -33,7 +33,7 @@ class EtherScanConfigAdmin(admin.ModelAdmin):
 @admin.register(ContractTransactionScanTask)
 class ContractTransactionScanTaskAdmin(admin.ModelAdmin):
     actions = ['do_scan_by_task']
-    list_filter = ['contract', 'status']
+    list_filter = ['status', 'contract']
     list_display = ('__str__', 'contract', 'block_range', 'status', 'create_time')
     readonly_fields = ['create_time', 'update_time']
 
@@ -61,7 +61,7 @@ class ContractTransactionScanTaskAdmin(admin.ModelAdmin):
 @admin.register(ContractEventScanTask)
 class ContractEventScanTaskAdmin(admin.ModelAdmin):
     actions = ['do_scan_by_task']
-    list_filter = ['contract', 'status']
+    list_filter = ['status', 'contract']
     list_display = ('__str__', 'contract', 'block_range', 'status', 'create_time')
     readonly_fields = ['create_time', 'update_time']
 
@@ -92,7 +92,7 @@ class ContractTransactionAdmin(admin.ModelAdmin):
     actions = ['retouch_trans']
     list_display = ['id', 'contract', 'function_name', 'status', 'block_number', 'create_time']
     readonly_fields = ['create_time']
-    list_filter = ['status']
+    list_filter = ['status', 'contract']
 
     search_fields = ['transaction_hash__exact']
 
@@ -108,7 +108,7 @@ class ContractEventAdmin(admin.ModelAdmin):
     actions = ['retouch_event']
     list_display = ['id', 'contract', 'topic', 'status', 'block_number', 'create_time']
     readonly_fields = ['create_time']
-    list_filter = ['status']
+    list_filter = ['status', 'contract']
 
     search_fields = ['transaction_hash__exact']
 

@@ -128,5 +128,18 @@
       "create_time": "2022-01-01T12:00:00",
       "update_time": "2022-01-01T12:00:00"
     }
+  },
+  {
+    "model": "blockchain.blockchain",
+    "pk": 61,
+    "fields": {
+      "fullname": "Ethereum Classic",
+      "symbol": "ETC",
+      "vm_type": "EVM",
+      "rpc_url": "https://www.ethercluster.com/etc",
+      "gas_price_wei": 50000000000,
+      "create_time": "2022-01-01T12:00:00",
+      "update_time": "2022-01-01T12:00:00"
+    }
   }
 ]
