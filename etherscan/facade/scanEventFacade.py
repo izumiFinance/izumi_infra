@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
 import logging
-from typing import Any, Dict, List, Tuple
+from typing import List
 
 from django.db.utils import IntegrityError
 

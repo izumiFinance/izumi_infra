@@ -1,15 +1,13 @@
-from django.conf import settings
 from django.db import models
 from django.db.models import F, Case, When
 from django.utils.translation import gettext as _
 
-from izumi_infra.blockchain.models import Blockchain, Contract
+from izumi_infra.blockchain.models import Contract
 from izumi_infra.etherscan.conf import etherscan_settings
 from izumi_infra.etherscan.constants import (INIT_SUB_STATUS, MAX_SUB_STATUS_BIT, ProcessingStatusEnum,
                                              ScanConfigAuditLevelEnum,
                                              ScanConfigStatusEnum,
-                                             ScanTaskStatusEnum, ScanTypeEnum,
-                                             SubReceiverGroupEnum)
+                                             ScanTaskStatusEnum, ScanTypeEnum)
 from izumi_infra.utils.model_utils import validate_checksum_address_list
 
 # Create your models here.

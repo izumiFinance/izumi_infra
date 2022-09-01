@@ -2,7 +2,6 @@
 import logging
 from datetime import datetime, timedelta
 
-from django.conf import settings
 from django.db import transaction
 from django.db.models.query import QuerySet
 from intervaltree import Interval, IntervalTree

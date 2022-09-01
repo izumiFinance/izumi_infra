@@ -1,17 +1,16 @@
 # -*- coding: utf-8 -*-
 import logging
-from typing import Dict, Any
-
 from random import randrange
+from typing import Any, Dict
+
 from eth_typing.encoding import HexStr
+from eth_utils import remove_0x_prefix, to_hex
 from eth_utils.address import to_checksum_address
-from eth_utils import to_hex, remove_0x_prefix
 from web3 import Web3
-from django.conf import settings
 from web3.types import TxParams
 
-from izumi_infra.blockchain.facade import BlockchainFacade
 from izumi_infra.blockchain.conf import blockchain_settings
+from izumi_infra.blockchain.facade import BlockchainFacade
 from izumi_infra.blockchain.models import TransactionSignInfo
 
 logger = logging.getLogger(__name__)

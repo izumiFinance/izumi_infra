@@ -1,6 +1,9 @@
-from django.test.signals import setting_changed
-from izumi_infra.utils.setting_helper import AppSettings
+# -*- coding: utf-8 -*-
 import os
+
+from django.test.signals import setting_changed
+
+from izumi_infra.utils.setting_helper import AppSettings
 
 DEFAULTS = {
     'DEFAULT_MAX_DELIVER_RETRY': int(os.environ.get("IZUMI_INFRA_ETHERSCAN.DEFAULT_MAX_DELIVER_RETRY", 15)),

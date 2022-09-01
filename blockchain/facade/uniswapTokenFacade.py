@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
-from datetime import datetime, timedelta
-import logging
-from typing import Any, Dict, List, Set
-from requests import Request, Session
 import json
+import logging
+from datetime import datetime, timedelta
+from typing import Any, Dict, List, Set
+
+from requests import Request, Session
+
 from izumi_infra.blockchain.types import TokenData
-from izumi_infra.blockchain.utils import sort_addr
 
 logger = logging.getLogger(__name__)
 

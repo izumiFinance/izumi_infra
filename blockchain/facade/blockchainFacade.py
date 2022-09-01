@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 from typing import List, Set, Type
-from django.conf import settings
+
 from eth_typing.encoding import HexStr
 from web3 import Web3
 from web3.contract import Contract
 from web3.middleware import geth_poa_middleware
 from web3.types import TxData, TxReceipt
 
+from izumi_infra.blockchain.conf import blockchain_settings
 from izumi_infra.blockchain.constants import BlockChainVmEnum
 from izumi_infra.blockchain.types import ContractMeta
-from izumi_infra.blockchain.conf import blockchain_settings
 from izumi_infra.etherscan.conf import etherscan_settings
 from izumi_infra.utils.collection_util import chunks
 from izumi_infra.utils.exceptions import NoEntriesFound

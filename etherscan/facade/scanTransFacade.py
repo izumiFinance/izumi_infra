@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 import logging
-from typing import Dict, List, Tuple
+from typing import List
 
-from django.conf import settings
 from django.db.utils import IntegrityError
-from web3.types import TxData
 
 from izumi_infra.etherscan.conf import etherscan_settings
 from izumi_infra.blockchain.context import contractHolder

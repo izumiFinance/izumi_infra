@@ -4,8 +4,8 @@ import logging
 from datetime import datetime, timedelta
 from typing import TypedDict
 
+from cachetools import TTLCache, cached
 from requests import Request, Session
-from cachetools import cached, TTLCache
 
 from izumi_infra.blockchain.constants import ChainIdEnum
 from izumi_infra.utils.base_context import BaseContext

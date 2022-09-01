@@ -2,7 +2,6 @@
 from datetime import datetime, timedelta
 from izumi_infra.etherscan.constants import ProcessingStatusEnum
 
-from django.conf import settings
 from django.db.models import F
 from izumi_infra.etherscan.models import ContractEvent, ContractTransaction
 from izumi_infra.etherscan.conf import etherscan_settings

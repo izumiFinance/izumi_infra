@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
+import json
 import logging
 from functools import reduce
-import json
 from typing import Dict, List, Set, Tuple, Type, TypeVar
-from unittest import result
+
 import eth_event
 from eth_typing.encoding import HexStr
-
 from eth_utils import encode_hex, event_abi_to_log_topic
 from hexbytes import HexBytes
 from web3.datastructures import AttributeDict
 from web3.types import EventData, TxData, TxReceipt
+
 from izumi_infra.blockchain.constants import ZERO_ADDRESS
 from izumi_infra.blockchain.facade import BlockchainFacade
 from izumi_infra.utils.collection_util import merge_dict_in_list, tuple_to_typedict

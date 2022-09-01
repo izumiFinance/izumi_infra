@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 import logging
-from eth_utils import to_checksum_address
-from izumi_infra.blockchain.constants import BaseContractInfoEnum
-from izumi_infra.blockchain.models import Blockchain, Contract
-from izumi_infra.blockchain.context import blockchainHolder, contractHolder
-from cachetools import cached, LRUCache
-from izumi_infra.blockchain.conf import blockchain_settings
 
+from cachetools import LRUCache, cached
+from eth_utils import to_checksum_address
+
+from izumi_infra.blockchain.conf import blockchain_settings
+from izumi_infra.blockchain.constants import BaseContractInfoEnum
+from izumi_infra.blockchain.context import blockchainHolder, contractHolder
+from izumi_infra.blockchain.models import Blockchain, Contract
 from izumi_infra.blockchain.types import Erc20TokenInfo
 
 logger = logging.getLogger(__name__)
