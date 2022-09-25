@@ -1,13 +1,18 @@
 # -*- coding: utf-8 -*-
 import logging
+from concurrent.futures import ThreadPoolExecutor, wait
 from typing import List
 
 from django.db.utils import IntegrityError
 
-from izumi_infra.etherscan.conf import etherscan_settings
 from izumi_infra.blockchain.context import contractHolder
-from izumi_infra.etherscan.constants import FILTER_SPLIT_CHAR, ScanConfigStatusEnum, ScanTaskStatusEnum, ScanTypeEnum
-from izumi_infra.etherscan.models import ContractTransaction, ContractTransactionScanTask, EtherScanConfig
+from izumi_infra.etherscan.conf import etherscan_settings
+from izumi_infra.etherscan.constants import (FILTER_SPLIT_CHAR,
+                                             ScanConfigStatusEnum,
+                                             ScanTaskStatusEnum, ScanTypeEnum)
+from izumi_infra.etherscan.models import (ContractTransaction,
+                                          ContractTransactionScanTask,
+                                          EtherScanConfig)
 from izumi_infra.etherscan.types import TransExtra, TransExtraData
 from izumi_infra.utils.collection_util import chunks
 
@@ -24,9 +29,14 @@ def scan_all_contract_transactions() -> None:
     ).all()
 
     # TODO 根据下面的场景加索引
-    for trans_scan_config in trans_scan_config_list:
-        scan_contract_transactions_by_config(trans_scan_config)
+    # TODO, keep same chain in one queue
+    with ThreadPoolExecutor(max_workers=etherscan_settings.TRANS_SCAN_MAX_WORKERS, thread_name_prefix='InfraTransScan') as e:
+        result = []
+        for trans_scan_config in trans_scan_config_list:
+            r = e.submit(scan_contract_transactions_by_config, trans_scan_config)
+            result.append(r)
 
+        wait(result)
 
 def scan_contract_transactions_by_config(trans_scan_config: ContractTransactionScanTask):
     try:
