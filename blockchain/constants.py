@@ -28,6 +28,7 @@ class ChainIdEnum(IntegerFieldEnum):
     Aurora = 1313161554
     AuroraTestnet = 1313161555
     ETC = 61
+    Cronos = 25
 
 # ChainMeta like
 ChainConfig = {
