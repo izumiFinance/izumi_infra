@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
 import logging
-from concurrent.futures import ThreadPoolExecutor, wait
+from concurrent.futures import wait
 from typing import List
 
 from django.db.utils import IntegrityError
@@ -15,6 +15,7 @@ from izumi_infra.etherscan.models import (ContractEvent, ContractEventScanTask,
                                           EtherScanConfig)
 from izumi_infra.etherscan.types import EventExtra, EventExtraData
 from izumi_infra.utils.collection_util import chunks
+from izumi_infra.utils.db_utils import DjangoDbConnSafeThreadPoolExecutor
 
 logger = logging.getLogger(__name__)
 
@@ -29,8 +30,9 @@ def scan_all_contract_event() -> None:
         status=ScanConfigStatusEnum.ENABLE
     ).all()
 
-    # TODO, keep same chain in one queue
-    with ThreadPoolExecutor(max_workers=etherscan_settings.EVENT_SCAN_MAX_WORKERS, thread_name_prefix='InfraEventScan') as e:
+    # TODO, keep same chain in one queue, min(max_worker_config, chainNum)
+    max_workers = etherscan_settings.EVENT_SCAN_MAX_WORKERS
+    with DjangoDbConnSafeThreadPoolExecutor(max_workers=max_workers, thread_name_prefix='InfraEventScan') as e:
         result = []
         for event_scan_config in event_scan_config_list:
             r = e.submit(scan_contract_event_by_config, event_scan_config)
