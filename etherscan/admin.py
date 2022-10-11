@@ -2,11 +2,13 @@ from datetime import datetime
 from typing import List
 from django.conf import settings
 from django.contrib import admin
-from izumi_infra.etherscan.constants import ProcessingStatusEnum, ScanTaskStatusEnum, ScanTypeEnum
+from izumi_infra.etherscan.constants import INIT_SUB_STATUS, MAX_SUB_STATUS_BIT, ProcessingStatusEnum, ScanTaskStatusEnum, ScanTypeEnum
 from izumi_infra.etherscan.facade.scanEventFacade import execute_unfinished_event_scan_task, scan_contract_event_by_config
 from izumi_infra.etherscan.facade.scanTransFacade import execute_unfinished_trans_scan_task, scan_contract_transactions_by_config
 
 from izumi_infra.etherscan.models import ContractEvent, ContractEventScanTask, ContractTransaction, ContractTransactionScanTask, EtherScanConfig
+
+from izumi_infra.etherscan.conf import etherscan_settings
 
 @admin.register(EtherScanConfig)
 class EtherScanConfigAdmin(admin.ModelAdmin):
@@ -106,11 +108,13 @@ class ContractTransactionAdmin(admin.ModelAdmin):
 @admin.register(ContractEvent)
 class ContractEventAdmin(admin.ModelAdmin):
     actions = ['retouch_event']
-    list_display = ['id', 'contract', 'topic', 'status', 'block_number', 'create_time']
+    list_display = ['id', 'contract', 'topic', 'status', 'get_sub_status', 'block_number', 'create_time']
     readonly_fields = ['create_time']
     list_filter = ['status', 'contract']
 
     search_fields = ['transaction_hash__exact']
+
+    inlines = [] if etherscan_settings.EVENT_ADMIN_INLINES_CLASS is None else [etherscan_settings.EVENT_ADMIN_INLINES_CLASS]
 
     @admin.action(description='Retouch event')
     def retouch_event(self, request, queryset: List[ContractEvent]):
@@ -118,3 +122,12 @@ class ContractEventAdmin(admin.ModelAdmin):
         for event in order_queryset:
             event.status = ProcessingStatusEnum.INITIAL
             event.save()
+
+    @admin.display(description='SubStatus')
+    def get_sub_status(self, contractEvent: ContractEvent):
+        if contractEvent.sub_status == INIT_SUB_STATUS:
+            return 'NO_SUB_TASK'
+        elif contractEvent.sub_status == 0:
+            return 'ALL_DONE'
+        else:
+            return format(contractEvent.sub_status, '08b')
