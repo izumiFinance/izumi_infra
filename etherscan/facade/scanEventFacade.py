@@ -13,6 +13,7 @@ from izumi_infra.etherscan.constants import (FILTER_SPLIT_CHAR,
                                              ScanTaskStatusEnum, ScanTypeEnum)
 from izumi_infra.etherscan.models import (ContractEvent, ContractEventScanTask,
                                           EtherScanConfig)
+from izumi_infra.etherscan.scan_utils import dict_to_EventData, get_filter_set_from_str
 from izumi_infra.etherscan.types import EventExtra, EventExtraData
 from izumi_infra.utils.collection_util import chunks
 from izumi_infra.utils.db_utils import DjangoDbConnSafeThreadPoolExecutor
@@ -87,7 +88,7 @@ def execute_unfinished_event_scan_task(unfinished_task: ContractEventScanTask) -
     if unfinished_task.status != ScanTaskStatusEnum.INITIAL: return
 
     event_extra = scan_event_by_task(unfinished_task)
-    is_all_success = insert_contract_event(unfinished_task, event_extra)
+    is_all_success = insert_contract_event(unfinished_task.scan_config, event_extra)
 
     if is_all_success:
         unfinished_task.status = ScanTaskStatusEnum.FINISHED
@@ -99,8 +100,8 @@ def scan_event_by_task(unfinished_task: ContractEventScanTask) -> List[EventExtr
     from_address_filter_list = unfinished_task.scan_config.from_address_filter_list
     to_address_filter_list = unfinished_task.scan_config.to_address_filter_list
     topic_filter_list = unfinished_task.scan_config.topic_filter_list
-    topic_filter_set = set([t.strip() for t in topic_filter_list.split(FILTER_SPLIT_CHAR) if t.strip()])
-    to_address_set = set([a.strip() for a in to_address_filter_list.split(FILTER_SPLIT_CHAR) if a.strip()])
+    topic_filter_set = get_filter_set_from_str(topic_filter_list)
+    to_address_set = get_filter_set_from_str(to_address_filter_list)
 
     event_logs = contract_facade.get_event_logs_by_name(unfinished_task.start_block_id,
                                     unfinished_task.end_block_id - 1, topic_filter_set, to_address_set)
@@ -112,7 +113,7 @@ def scan_event_by_task(unfinished_task: ContractEventScanTask) -> List[EventExtr
 
     # fromAddress if filter
     if from_address_filter_list:
-        from_address_set = set(map(lambda a: a.strip(), from_address_filter_list.split(FILTER_SPLIT_CHAR)))
+        from_address_set = get_filter_set_from_str(from_address_filter_list)
         for ex in event_extra:
             from_address = contract_facade.get_transaction_by_tx_hash(ex['event']['transactionHash'])['from']
             ex['extra']['fromAddress'] = from_address
@@ -121,20 +122,32 @@ def scan_event_by_task(unfinished_task: ContractEventScanTask) -> List[EventExtr
 
     return event_extra
 
-def insert_contract_event(unfinished_task: ContractEventScanTask, event_extra: List[EventExtra]) -> bool:
+def insert_contract_event_from_dict(scanConfigId: int, eventDataResult: str) -> bool:
+    try:
+        event_dict = json.loads(eventDataResult)['params']['result']
+        scan_config = EtherScanConfig.objects.get(id=scanConfigId)
+        contract_facade = contractHolder.get_facade_by_model(scan_config.contract)
+        eventData = dict_to_EventData(event_dict)
+        eventExtra = EventExtra(event=eventData, extra=EventExtraData(data=contract_facade.decode_event_log(eventData)))
+        insert_contract_event(scan_config, [eventExtra])
+    except Exception as e:
+        logger.error(f"insert_contract_event_from_dict error, scanConfigId: {scanConfigId}, {eventDataResult}")
+        logger.exception(e)
+
+def insert_contract_event(scan_config: EtherScanConfig, event_extra: List[EventExtra]) -> bool:
     """
     Insert event logs scanned in blockchain event which topic is OrderCreated
     """
     failed_count = 0
-    contract_facade = contractHolder.get_facade_by_model(unfinished_task.contract)
-    max_deliver_retry = unfinished_task.scan_config.max_deliver_retry
+    contract_facade = contractHolder.get_facade_by_model(scan_config.contract)
+    max_deliver_retry = scan_config.max_deliver_retry
 
     for event in event_extra:
         try:
             event_log = event['event']
             extra = event['extra']
             event_record = {
-                'contract': unfinished_task.contract,
+                'contract': scan_config.contract,
                 'topic': contract_facade.topic_to_topic_name_mapping.get(event_log['topics'][0].hex()),
                 'block_hash': event_log['blockHash'].hex(),
                 'block_number': event_log['blockNumber'],

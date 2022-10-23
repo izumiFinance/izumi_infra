@@ -134,6 +134,6 @@ add it to your django conf like
 ```py
 MIDDLEWARE = [
     ...
-    'middleware.exception_handler.ExceptionMiddleware'
+    'izumi_infra.middleware.exception_handler.ExceptionMiddleware'
 ]
 ```

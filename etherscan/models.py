@@ -6,7 +6,7 @@ from izumi_infra.blockchain.models import Contract
 from izumi_infra.etherscan.conf import etherscan_settings
 from izumi_infra.etherscan.constants import (INIT_SUB_STATUS, MAX_SUB_STATUS_BIT, ProcessingStatusEnum,
                                              ScanConfigAuditLevelEnum,
-                                             ScanConfigStatusEnum,
+                                             ScanConfigStatusEnum, ScanModeEnum,
                                              ScanTaskStatusEnum, ScanTypeEnum)
 from izumi_infra.utils.model_utils import validate_checksum_address_list
 
@@ -18,6 +18,7 @@ class EtherScanConfig(models.Model):
     # 如果是 0 地址的合约，地址过滤时将使用本合约的地址
     contract = models.ForeignKey(Contract, on_delete=models.SET_NULL, null=True, related_name = 'RelatedEtherScanConfig')
     scan_type = models.SmallIntegerField("ScanType", default=ScanTypeEnum.Event, choices=ScanTypeEnum.choices())
+    scan_mode = models.SmallIntegerField("ScanMode", default=ScanModeEnum.Basic, choices=ScanModeEnum.choices())
 
     stable_block_offset = models.PositiveSmallIntegerField("StableBlockOffset", default=etherscan_settings.SAFE_BLOCK_NUM_OFFSET)
 

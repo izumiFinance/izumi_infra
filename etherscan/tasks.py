@@ -7,7 +7,7 @@ from izumi_infra.etherscan.facade.auditEventFacade import audit_event_entry
 from izumi_infra.etherscan.facade.auditTransFacade import audit_trans_entry
 from izumi_infra.etherscan.facade.scanEntityFacade import scan_and_touch_entity
 
-from izumi_infra.etherscan.facade.scanEventFacade import scan_all_contract_event
+from izumi_infra.etherscan.facade.scanEventFacade import insert_contract_event_from_dict, scan_all_contract_event
 from izumi_infra.etherscan.facade.scanTransFacade import scan_all_contract_transactions
 from izumi_infra.utils.date_utils import PYTHON_DATE_FORMAT, dayRange
 
@@ -68,3 +68,9 @@ def etherscan_audit_trans_scan_task(*args, **kwargs):
     for audit_start_time in audit_start_time_list:
         logger.info(f"start audit trans day: {datetime.strftime(audit_start_time, PYTHON_DATE_FORMAT)}")
         audit_trans_entry(audit_start_time, audit_slice_hours)
+
+### async event
+@shared_task()
+def etherscan_async_event_save(scanConfigId: int, eventDataResult: str):
+    logger.info(f"etherscan_async_event_save, scanConfigId: {scanConfigId}")
+    insert_contract_event_from_dict(scanConfigId, eventDataResult)

@@ -15,7 +15,7 @@ class EtherScanConfigAdmin(admin.ModelAdmin):
     # TODO action 可以删掉数据
     actions = ['do_scan_by_config']
     list_filter = ['contract', 'scan_type', 'status']
-    list_display = ('__str__', 'contract', 'scan_type', 'status', 'create_time')
+    list_display = ('__str__', 'contract', 'scan_type', 'scan_mode', 'status', 'create_time')
 
     @admin.action(description='Do scan by config')
     def do_scan_by_config(self, request, queryset):

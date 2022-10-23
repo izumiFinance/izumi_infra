@@ -7,6 +7,12 @@ class ScanTypeEnum(IntegerFieldEnum):
     Transaction = 0
     Event = 1
 
+class ScanModeEnum(IntegerFieldEnum):
+    Basic = 0
+
+    # AsyncEthScanThread
+    RealtimeEventScan = 1
+
 class ScanConfigStatusEnum(IntegerFieldEnum):
     DISABLE = 0
     ENABLE = 1
