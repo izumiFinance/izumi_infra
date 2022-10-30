@@ -29,6 +29,13 @@ class StringFieldValueEnum(StringEnum):
     def __hash__(self) -> int:
         return self.value.__hash__()
 
+    def __str__(self) -> str:
+        return self.value
+
+    def __eq__(self, o: object) -> bool:
+        return self.value.__eq__(o)
+
+
 class IntegerFieldEnum(IntegerEnum):
     @classmethod
     def choices(cls):

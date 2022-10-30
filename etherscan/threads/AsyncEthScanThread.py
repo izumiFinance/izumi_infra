@@ -82,7 +82,7 @@ class AsyncEthScanThread(Thread):
                             #     logger.warn(f'eth_unsubscribe: {recv_subscription_id} diff current: {subscription_id}, result {response}')
                         except asyncio.TimeoutError as e:
                             # 需要超时机制来重连保证稳定性
-                            logger.error('TimeoutError')
+                            logger.error('SubscriptionTimeout, start reSubscription')
                             break
                         except Exception as e:
                             logger.error(f'exception when recv for eth_subscribe')
