@@ -10,6 +10,7 @@ TYPE_MAPPING = {
     re.compile("int*"): "int",
     re.compile("address"): "str",
     re.compile("struct *"): "struct",
+    re.compile("tuple"): "struct",
     re.compile("tuple\[\]"): "struct",
     re.compile("bool"): "bool",
     re.compile("bytes*"): "str",
@@ -60,7 +61,7 @@ def composeParamTypeDictAST(name: str, param_type_list: List[AbiParamTypeDict]):
     result = {main_type_dict_define: type_dict_field_list}
     for i, param_type in enumerate(param_type_list):
         match_type_list = [TYPE_MAPPING[t] for t in TYPE_MAPPING.keys() if t.match(param_type["type"])]
-        if not match_type_list: raise Exception("not support type mapping: " + param_type)
+        if not match_type_list: raise Exception("not support type mapping: " + str(param_type))
         match_type = match_type_list[0]
         if match_type == "struct":
            nested_type_dict_name, nested_type_dict = composeParamTypeDictAST(param_type["name"], param_type["components"])
