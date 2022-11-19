@@ -1,14 +1,17 @@
 # -*- coding: utf-8 -*-
-from datetime import datetime, timedelta
 import logging
+from datetime import datetime, timedelta
+
 from celery.app import shared_task
 from celery_once import QueueOnce
+
 from izumi_infra.etherscan.facade.auditEventFacade import audit_event_entry
 from izumi_infra.etherscan.facade.auditTransFacade import audit_trans_entry
 from izumi_infra.etherscan.facade.scanEntityFacade import scan_and_touch_entity
-
-from izumi_infra.etherscan.facade.scanEventFacade import insert_contract_event_from_dict, scan_all_contract_event
-from izumi_infra.etherscan.facade.scanTransFacade import scan_all_contract_transactions
+from izumi_infra.etherscan.facade.scanEventFacade import (
+    insert_contract_event_from_dict, scan_all_contract_event)
+from izumi_infra.etherscan.facade.scanTransFacade import \
+    scan_all_contract_transactions
 from izumi_infra.utils.date_utils import PYTHON_DATE_FORMAT, dayRange
 
 logger = logging.getLogger(__name__)

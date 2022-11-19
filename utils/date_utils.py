@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+import time
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 
@@ -37,10 +39,16 @@ def get_interval_round_time_range(start_time: datetime, end_time: datetime, delt
     """
     min day
     time between [start_time, end_time) and time % delta == 0
+
+    start = datetime.strptime("2022-11-01 00:00:00", PYTHON_DATETIME_FORMAT)
+    end = datetime.strptime("2022-11-03 00:00:00", PYTHON_DATETIME_FORMAT)
+    list(get_interval_round_time_range(start, end,timedelta(days=2)))
     """
+    timezone_secs = time.timezone
     delta_seconds = int(delta.total_seconds())
-    start_round_timestamp = right_close_round_number(int(start_time.timestamp()), delta_seconds)
-    end_round_timestamp = left_open_round_number(int(end_time.timestamp()), delta_seconds)
+    start_round_timestamp = right_close_round_number(int(start_time.timestamp()) - timezone_secs, delta_seconds) + timezone_secs
+    end_round_timestamp = left_open_round_number(int(end_time.timestamp()) - timezone_secs, delta_seconds) + timezone_secs
+    print(start_round_timestamp, end_round_timestamp)
     n = (end_round_timestamp - start_round_timestamp) // delta_seconds + 1
     for i in range(n):
         yield datetime.fromtimestamp(start_round_timestamp + i * delta_seconds)
