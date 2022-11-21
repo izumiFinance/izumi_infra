@@ -48,7 +48,6 @@ def get_interval_round_time_range(start_time: datetime, end_time: datetime, delt
     delta_seconds = int(delta.total_seconds())
     start_round_timestamp = right_close_round_number(int(start_time.timestamp()) - timezone_secs, delta_seconds) + timezone_secs
     end_round_timestamp = left_open_round_number(int(end_time.timestamp()) - timezone_secs, delta_seconds) + timezone_secs
-    print(start_round_timestamp, end_round_timestamp)
     n = (end_round_timestamp - start_round_timestamp) // delta_seconds + 1
     for i in range(n):
         yield datetime.fromtimestamp(start_round_timestamp + i * delta_seconds)
