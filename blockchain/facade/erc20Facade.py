@@ -27,7 +27,7 @@ def get_erc20_token_balance(chain_id: int, token_addr: str, account_addr: str, d
         blockchain = Blockchain.objects.get(chain_id=chain_id)
         tokenContract = contractHolder.get_facade_by_info(blockchain, to_checksum_address(token_addr), BaseContractInfoEnum.ERC20.abi)
         balance_decimal = tokenContract.contract.functions.balanceOf(to_checksum_address(account_addr)).call()
-        if not decimal:
+        if decimal:
             token_decimal = decimal
         else:
             token_info = get_erc20_token_info(chain_id, token_addr)
