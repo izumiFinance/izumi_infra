@@ -32,6 +32,7 @@ class ChainIdEnum(IntegerFieldEnum):
     ZkSyncAlphaTest = 280
     MantleTest = 5001
     ScrollTestL2 = 534354
+    Icplaza = 9000
 
 # ChainMeta like
 ChainConfig = {

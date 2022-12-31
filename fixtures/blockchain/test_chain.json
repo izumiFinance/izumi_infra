@@ -71,7 +71,7 @@
       "fullname": "Mantle TestNet",
       "symbol": "MantleTest",
       "vm_type": "EVM",
-      "rpc_url": "https://explorer.testnet.mantle.xyz",
+      "rpc_url": "https://rpc.testnet.mantle.xyz",
       "gas_price_wei": 5000000000,
       "create_time": "2022-01-01T15:40:23.184",
       "update_time": "2021-01-01T12:00:00"
@@ -84,7 +84,7 @@
       "fullname": "Scroll TestNetL2",
       "symbol": "ScrollTestL2",
       "vm_type": "EVM",
-      "rpc_url": "https://prealpha.scroll.io/l2scan/",
+      "rpc_url": "https://prealpha.scroll.io/l2",
       "gas_price_wei": 5000000000,
       "create_time": "2022-01-01T15:40:23.184",
       "update_time": "2021-01-01T12:00:00"
