@@ -12,10 +12,10 @@ from izumi_infra.utils.model_utils import validate_eth_address
 class Blockchain(models.Model):
     fullname = models.CharField("Name", max_length=128, default="")
     symbol = models.CharField("Symbol", unique=True, max_length=30, default="")
-    vm_type = models.CharField("VmType", max_length=30, default=BlockChainVmEnum.EVM, choices=BlockChainVmEnum.choices())
+    vm_type = models.CharField("VmType", max_length=30, default=BlockChainVmEnum.EVM.value, choices=BlockChainVmEnum.choices())
 
     rpc_url = models.CharField("RPCUrl", max_length=300, default="")
-    ws_rpc_url = models.CharField("WebsocketRPCUrl", max_length=300, default="")
+    ws_rpc_url = models.CharField("WebsocketRPCUrl", max_length=300, default="", blank=True)
     chain_id = models.PositiveBigIntegerField("ChainId", unique=True, primary_key=True)
 
     gas_price_wei = models.PositiveBigIntegerField("GasPriceWei", default=5_000_000_000, validators=[MaxValueValidator(100_000_000_000)])
@@ -30,7 +30,7 @@ class Contract(models.Model):
     id = models.PositiveBigIntegerField(primary_key=True)
     name = models.CharField("Name", unique=True, max_length=128)
     type = models.CharField("Type", max_length=64, choices=blockchain_settings.CONTRACT_CHOICES_CLASS.contract_type_choices())
-    status = models.SmallIntegerField("Status", default=ContractStatusEnum.INITIAL, choices=ContractStatusEnum.choices())
+    status = models.SmallIntegerField("Status", default=ContractStatusEnum.INITIAL.value, choices=ContractStatusEnum.choices())
 
     chain = models.ForeignKey(Blockchain, on_delete=models.SET_NULL, null=True, related_name='RelatedContract')
 

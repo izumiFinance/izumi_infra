@@ -15,16 +15,14 @@ def scan_and_touch_entity():
     """
     offset_time = datetime.now() - timedelta(minutes=etherscan_settings.ENTITY_TOUCH_OFFSET_MINUTES)
 
-    unprocessed_event_entity = ContractEvent.objects.filter(
+    unprocessed_event_entity = ContractEvent.objects.exclude(touch_count_remain=0).filter(
         create_time__lt=offset_time,
         status=ProcessingStatusEnum.INITIAL,
-        touch_count_remain__gt=0
     ).order_by('create_time')
 
-    unprocessed_trans_entity = ContractTransaction.objects.filter(
+    unprocessed_trans_entity = ContractTransaction.objects.exclude(touch_count_remain=0).filter(
         create_time__lt=offset_time,
         status=ProcessingStatusEnum.INITIAL,
-        touch_count_remain__gt=0
     ).order_by('create_time')
 
     order_unprocessed_entity = sorted(

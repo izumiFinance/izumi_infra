@@ -17,8 +17,8 @@ class EtherScanConfig(models.Model):
 
     # 如果是 0 地址的合约，地址过滤时将使用本合约的地址
     contract = models.ForeignKey(Contract, on_delete=models.SET_NULL, null=True, related_name = 'RelatedEtherScanConfig')
-    scan_type = models.SmallIntegerField("ScanType", default=ScanTypeEnum.Event, choices=ScanTypeEnum.choices())
-    scan_mode = models.SmallIntegerField("ScanMode", default=ScanModeEnum.Basic, choices=ScanModeEnum.choices())
+    scan_type = models.SmallIntegerField("ScanType", default=ScanTypeEnum.Event.value, choices=ScanTypeEnum.choices())
+    scan_mode = models.SmallIntegerField("ScanMode", default=ScanModeEnum.Basic.value, choices=ScanModeEnum.choices())
 
     stable_block_offset = models.PositiveSmallIntegerField("StableBlockOffset", default=etherscan_settings.SAFE_BLOCK_NUM_OFFSET)
 
@@ -31,9 +31,9 @@ class EtherScanConfig(models.Model):
 
     # 最大重试交付次数，0 不重试
     max_deliver_retry = models.IntegerField("MaxRetryDeliver", default=etherscan_settings.DEFAULT_MAX_DELIVER_RETRY)
-    audit_level = models.PositiveIntegerField("AuditLevel", default=ScanConfigAuditLevelEnum.DISABLE, choices=ScanConfigAuditLevelEnum.choices())
+    audit_level = models.PositiveIntegerField("AuditLevel", default=ScanConfigAuditLevelEnum.ENABLE.value, choices=ScanConfigAuditLevelEnum.choices())
 
-    status = models.SmallIntegerField("Status", default=ScanConfigStatusEnum.DISABLE, choices=ScanConfigStatusEnum.choices())
+    status = models.SmallIntegerField("Status", default=ScanConfigStatusEnum.ENABLE.value, choices=ScanConfigStatusEnum.choices())
 
     create_time = models.DateTimeField("CreateTime", db_index=True, auto_now_add=True)
     update_time = models.DateTimeField("UpdateTime", auto_now=True)
@@ -74,7 +74,7 @@ class ContractTransactionScanTask(models.Model):
     start_block_id = models.PositiveBigIntegerField("StartBlockId")
     end_block_id = models.PositiveBigIntegerField("EndBlockId", db_index=True)
 
-    status = models.SmallIntegerField("Status", default=ScanTaskStatusEnum.INITIAL, choices=ScanTaskStatusEnum.choices())
+    status = models.SmallIntegerField("Status", default=ScanTaskStatusEnum.INITIAL.value, choices=ScanTaskStatusEnum.choices())
 
     create_time = models.DateTimeField("CreateTime", db_index=True, auto_now_add=True)
     update_time = models.DateTimeField("UpdateTime", auto_now=True)
@@ -97,7 +97,7 @@ class ContractEventScanTask(models.Model):
     start_block_id = models.PositiveBigIntegerField("StartBlockId")
     end_block_id = models.PositiveBigIntegerField("EndBlockId", db_index=True)
 
-    status = models.SmallIntegerField("Status", default=ScanTaskStatusEnum.INITIAL, choices=ScanTaskStatusEnum.choices())
+    status = models.SmallIntegerField("Status", default=ScanTaskStatusEnum.INITIAL.value, choices=ScanTaskStatusEnum.choices())
 
     create_time = models.DateTimeField("CreateTime", db_index=True, auto_now_add=True)
     update_time = models.DateTimeField("UpdateTime", auto_now=True)
@@ -134,7 +134,7 @@ class ContractTransaction(models.Model):
     value = models.CharField("value", max_length=128)
     input_data = models.TextField("input")
 
-    status = models.SmallIntegerField("ProcessStatusStatus", default=ProcessingStatusEnum.INITIAL, choices=ProcessingStatusEnum.choices())
+    status = models.SmallIntegerField("ProcessStatusStatus", default=ProcessingStatusEnum.INITIAL.value, choices=ProcessingStatusEnum.choices())
     sub_status = models.SmallIntegerField("ProcessSubStatus", default=INIT_SUB_STATUS)
     touch_count_remain = models.IntegerField("TouchCountRemain", default=0)
     create_time = models.DateTimeField("CreateTime", auto_now_add=True)
@@ -162,7 +162,10 @@ class ContractTransaction(models.Model):
     class Meta:
         verbose_name = _("ContractTransaction")
         verbose_name_plural = _("ContractTransaction")
-        index_together = [['contract', 'function_name', 'status'], ['create_time', 'status', 'touch_count_remain']]
+        index_together = [
+            ['contract', 'function_name', 'status'],
+            ['status', 'touch_count_remain', 'create_time']
+        ]
         unique_together = [['transaction_hash', 'function_name']]
 
     def __str__(self):
@@ -189,7 +192,7 @@ class ContractEvent(models.Model):
 
     data = models.TextField("data")
 
-    status = models.SmallIntegerField("ProcessStatus", default=ProcessingStatusEnum.INITIAL, choices=ProcessingStatusEnum.choices())
+    status = models.SmallIntegerField("ProcessStatus", default=ProcessingStatusEnum.INITIAL.value, choices=ProcessingStatusEnum.choices())
     sub_status = models.IntegerField("ProcessSubStatus", default=INIT_SUB_STATUS)
     touch_count_remain = models.IntegerField("TouchCountRemain", default=0)
     create_time = models.DateTimeField("CreateTime", auto_now_add=True)
@@ -217,7 +220,10 @@ class ContractEvent(models.Model):
     class Meta:
         verbose_name = _("ContractEvent")
         verbose_name_plural = _("ContractEvent")
-        index_together = [['contract', 'topic', 'status'], ['create_time', 'status', 'touch_count_remain']]
+        index_together = [
+            ['contract', 'topic', 'status'],
+            ['status', 'touch_count_remain', 'create_time']
+        ]
         unique_together = [['transaction_hash', 'log_index']]
 
     def __str__(self):
