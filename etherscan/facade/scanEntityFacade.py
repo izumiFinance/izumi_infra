@@ -18,13 +18,13 @@ def scan_and_touch_entity():
     unprocessed_event_entity = ContractEvent.objects.filter(
         create_time__lt=offset_time,
         status=ProcessingStatusEnum.INITIAL,
-        touch_count_remain=0
+        touch_count_remain__gt=0
     ).order_by('create_time')
 
-    unprocessed_trans_entity = ContractTransaction.objects.exclude().filter(
+    unprocessed_trans_entity = ContractTransaction.objects.filter(
         create_time__lt=offset_time,
         status=ProcessingStatusEnum.INITIAL,
-        touch_count_remain=0
+        touch_count_remain__gt=0
     ).order_by('create_time')
 
     order_unprocessed_entity = sorted(
