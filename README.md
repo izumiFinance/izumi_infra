@@ -66,7 +66,7 @@ support change default conf by set new object named `IZUMI_INFRA_ETHERSCAN`, or 
 
 ### extensions
 
-### admin login ip limit and captcha
+#### admin login ip limit and captcha
 
 add izumi_infra.extensions at your INSTALLED_APPS.
 
@@ -115,15 +115,53 @@ location ^~ /admin/ {
 
 limit ip and admin site title conf see `izumi_infra/extensions/conf.py`.
 
-### django manage commands
+#### django manage commands
 
 features:
 
 - `abitypegen` generate typing files of Python by Contract abi file
+  - example: `python manage.py abitypegen izumi_infra/blockchain/data/abi/erc/erc20.json`
 - `backupdb` backup database as sql file
 - `cleanup` reset database for django project initial
 - `loaddatax` load fixtures data with ignore
 - `sqldiff` show different of schema between database and django model
+
+#### async log for sending alert email
+
+1. config AsyncEmailAlertLogHandler as FATAL level handlers.
+
+```py
+# django config file
+LOGGING = {
+    'handlers': {
+        ...
+        'email-alert': {
+            'level': 'FATAL',
+            'class': 'izumi_infra.extensions.AsyncEmailAlertLogHandler',
+            'formatter': 'verbose'
+        },
+    },
+    'loggers': {
+        'XXX': {
+            'handlers': [..., 'email-alert'],
+        }
+    }
+}
+```
+
+2. add email which receive alert email to your superuser by admin page, or config at [ADMINS](https://docs.djangoproject.com/en/4.1/ref/settings/#admins). custom email from user will use first not blank value of `extensions_settings.ALERT_FROM_EMAIL`, `settings.SERVER_EMAIL`, `settings.DEFAULT_FROM_EMAIL` or default **alert@notifications.izumi.finance**
+
+3. config django email backend, example
+
+```py
+# django config file
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_USE_TLS = True
+EMAIL_PORT = XXX
+EMAIL_HOST = XXX
+EMAIL_HOST_USER = XXX
+EMAIL_HOST_PASSWORD = XXX
+```
 
 ### utils
 

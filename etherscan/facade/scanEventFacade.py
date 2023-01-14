@@ -3,6 +3,7 @@ import json
 import logging
 from concurrent.futures import wait
 from typing import List
+import traceback
 
 from django.db.utils import IntegrityError
 
@@ -59,6 +60,7 @@ def scan_contract_event_by_config(event_scan_config: EtherScanConfig):
         except Exception as e:
             logger.error(f"execute_unfinished_event_scan_task error, task: {task}")
             logger.exception(e)
+            logger.critical(f'event scan exception: {traceback.format_exc(limit=1)}')
 
 
 def add_event_scan_task(event_scan_config: EtherScanConfig):
