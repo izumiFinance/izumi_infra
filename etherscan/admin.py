@@ -18,7 +18,7 @@ class EtherScanConfigAdmin(admin.ModelAdmin):
     list_display = ('__str__', 'contract', 'scan_type', 'scan_mode', 'status', 'create_time')
 
     @admin.action(description='Do scan by config')
-    def do_scan_by_config(self, request, queryset):
+    def do_scan_by_config(self, request, queryset: List[EtherScanConfig]):
         for config in queryset:
             if config.scan_type == ScanTypeEnum.Event:
                 scan_contract_event_by_config(config)
@@ -42,7 +42,7 @@ class ContractTransactionScanTaskAdmin(admin.ModelAdmin):
     search_fields = ['end_block_id']
 
     @admin.display(ordering='start_block_id', description='Scan block range')
-    def block_range(self, instance):
+    def block_range(self, instance: ContractTransactionScanTask):
         # TODO text align
         return "[{} ~ {})".format(instance.start_block_id, instance.end_block_id)
 
@@ -70,7 +70,7 @@ class ContractEventScanTaskAdmin(admin.ModelAdmin):
     search_fields = ['end_block_id']
 
     @admin.display(ordering='start_block_id', description='Scan block range')
-    def block_range(self, instance):
+    def block_range(self, instance: ContractEventScanTask):
         # TODO text align
         return "[{} ~ {})".format(instance.start_block_id, instance.end_block_id)
 
@@ -100,7 +100,7 @@ class ContractTransactionAdmin(admin.ModelAdmin):
 
     @admin.action(description='Retouch trans')
     def retouch_trans(self, request, queryset: List[ContractTransaction]):
-        order_queryset = queryset.order_by('block_number', 'transaction_index')
+        order_queryset: List[ContractTransaction] = queryset.order_by('block_number', 'transaction_index')
         for trans in order_queryset:
             trans.status = ProcessingStatusEnum.INITIAL
             trans.save()
@@ -110,7 +110,7 @@ class ContractEventAdmin(admin.ModelAdmin):
     actions = ['retouch_event']
     list_display = ['id', 'contract', 'topic', 'status', 'get_sub_status', 'block_number', 'create_time']
     readonly_fields = ['create_time']
-    list_filter = ['status', 'contract']
+    list_filter = ['status', 'contract', 'topic']
 
     search_fields = ['transaction_hash__exact']
 
@@ -118,7 +118,7 @@ class ContractEventAdmin(admin.ModelAdmin):
 
     @admin.action(description='Retouch event')
     def retouch_event(self, request, queryset: List[ContractEvent]):
-        order_queryset = queryset.order_by('block_number', 'log_index')
+        order_queryset: List[ContractEvent] = queryset.order_by('block_number', 'log_index')
         for event in order_queryset:
             event.status = ProcessingStatusEnum.INITIAL
             event.save()
