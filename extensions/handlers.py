@@ -8,7 +8,7 @@ class AsyncEmailAlertLogHandler(StreamHandler):
         super().__init__()
 
     def emit(self, record: LogRecord) -> None:
-        super().emit(record)
-        msg_subject = f'[System Alert] [{record.asctime}] - {record.message}'
+        # super().emit(record)
+        msg_subject = f'[System Alert] [{record.asctime}] - {record.message[:30]}'
         msg_body = self.formatter.format(record)
         send_email_to_superuser_task.delay(msg_subject, msg_body)

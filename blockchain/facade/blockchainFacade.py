@@ -13,6 +13,7 @@ from izumi_infra.blockchain.types import ContractMeta
 from izumi_infra.etherscan.conf import etherscan_settings
 from izumi_infra.utils.collection_util import chunks
 from izumi_infra.utils.exceptions import NoEntriesFound
+from izumi_infra.utils.web3.exception_log_middleware import rpc_exception_log_middleware
 
 
 class BlockchainFacade():
@@ -30,6 +31,7 @@ class BlockchainFacade():
         if vm_type == BlockChainVmEnum.EVM:
             self.w3 = Web3(Web3.HTTPProvider(self.rpc_url, request_kwargs={'timeout': blockchain_settings.WEB3_HTTP_RPC_TIMEOUT}))
             self.w3.middleware_onion.inject(geth_poa_middleware, layer=0)
+            self.w3.middleware_onion.inject(rpc_exception_log_middleware, layer=0)
         else:
             raise NoEntriesFound("No matching entries for '{}'".format(chain_symbol))
 
