@@ -3,6 +3,7 @@ from django.db import connections
 from functools import wraps
 from concurrent.futures import ThreadPoolExecutor
 from django.db import connection
+from django.core.paginator import Paginator
 
 def close_old_connections(**kwargs):
     for conn in connections.all():
@@ -47,3 +48,13 @@ class DjangoDbConnSafeThreadPoolExecutor(ThreadPoolExecutor):
             self, *args = args
 
         return super(self.__class__, self).submit(fn, *args, **kwargs)
+
+def chunked_iterator(queryset, chunk_size=2000):
+    """
+    MySQL do not support streaming results for code: XxxModel.objects.all().iterator()
+    https://docs.djangoproject.com/en/4.1/ref/models/querysets/#without-server-side-cursors
+    """
+    paginator = Paginator(queryset, chunk_size)
+    for page in range(1, paginator.num_pages + 1):
+        for obj in paginator.page(page).object_list:
+            yield obj
