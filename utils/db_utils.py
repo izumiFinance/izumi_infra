@@ -1,9 +1,16 @@
 # -*- coding: utf-8 -*-
+from typing import Iterator, TypeVar, Generic
 from django.db import connections
+from django.db.models import QuerySet
 from functools import wraps
 from concurrent.futures import ThreadPoolExecutor
 from django.db import connection
 from django.core.paginator import Paginator
+
+_Z = TypeVar("_Z")
+
+class QueryType(QuerySet, Generic[_Z]):
+    def __iter__(self) -> Iterator[_Z]: ...
 
 def close_old_connections(**kwargs):
     for conn in connections.all():
@@ -58,3 +65,15 @@ def chunked_iterator(queryset, chunk_size=2000):
     for page in range(1, paginator.num_pages + 1):
         for obj in paginator.page(page).object_list:
             yield obj
+
+def order_chunked_iterator(queryset: QueryType, init_pk=-1, chunk_size=2000):
+    """
+    Order iterator by pk
+    """
+    last_pk = init_pk
+    fetch_size = chunk_size
+    while fetch_size >= chunk_size:
+        data = queryset.filter(pk__gt=last_pk).order_by('pk')[:chunk_size]
+        fetch_size = len(data)
+        if fetch_size > 0: last_pk = data[fetch_size-1].pk
+        yield data
