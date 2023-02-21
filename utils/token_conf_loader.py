@@ -9,8 +9,8 @@ from izumi_infra.blockchain.types import TokenConfigType, TokenMeta
 
 logger = logging.getLogger(__name__)
 
-PROD_TOKEN_LIST_URL = 'https://raw.githubusercontent.com/izumiFinance/izumi-tokenList/main/build/tokenList.json';
-DEV_TOKEN_LIST_URL = 'https://raw.githubusercontent.com/izumiFinance/izumi-tokenList/main/build/tokenListDev.json';
+PROD_TOKEN_LIST_URL = 'https://raw.githubusercontent.com/izumiFinance/izumi-tokenList/main/build/tokenList.json'
+DEV_TOKEN_LIST_URL = 'https://raw.githubusercontent.com/izumiFinance/izumi-tokenList/main/build/tokenListDev.json'
 
 class GithubContractConfig(TypedDict):
     address: str
