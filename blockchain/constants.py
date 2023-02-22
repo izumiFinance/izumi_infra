@@ -35,6 +35,7 @@ class ChainIdEnum(IntegerFieldEnum):
     Icplaza = 9000
     BedrockRolluxTestL2 = 57000
     ConfluxESpace = 1030
+    Meter = 82
 
 # ChainMeta like
 ChainConfig = {
