@@ -14,7 +14,7 @@ from izumi_infra.etherscan.models import (ContractTransaction,
                                           ContractTransactionScanTask,
                                           EtherScanConfig)
 from izumi_infra.etherscan.types import TransExtra, TransExtraData
-from izumi_infra.utils.collection_util import chunks
+from izumi_infra.utils.collection_utils import chunks
 from izumi_infra.utils.db_utils import DjangoDbConnSafeThreadPoolExecutor
 
 logger = logging.getLogger(__name__)

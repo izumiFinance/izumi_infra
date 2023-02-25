@@ -11,7 +11,7 @@ from izumi_infra.blockchain.conf import blockchain_settings
 from izumi_infra.blockchain.constants import BlockChainVmEnum
 from izumi_infra.blockchain.types import ContractMeta
 from izumi_infra.etherscan.conf import etherscan_settings
-from izumi_infra.utils.collection_util import chunks
+from izumi_infra.utils.collection_utils import chunks
 from izumi_infra.utils.exceptions import NoEntriesFound
 from izumi_infra.utils.web3.exception_log_middleware import rpc_exception_log_middleware
 

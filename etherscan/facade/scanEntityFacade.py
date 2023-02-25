@@ -32,6 +32,7 @@ def scan_and_touch_entity():
         # touch by order
             entity.touch_count_remain = F('touch_count_remain') - 1
             entity.save()
+        # TODO consumer side queue
         sleep(1)
 
     for entity_list in order_chunked_iterator(unprocessed_trans_query, chunk_size=20):

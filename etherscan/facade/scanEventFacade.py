@@ -16,7 +16,7 @@ from izumi_infra.etherscan.models import (ContractEvent, ContractEventScanTask,
                                           EtherScanConfig)
 from izumi_infra.etherscan.scan_utils import dict_to_EventData, get_filter_set_from_str
 from izumi_infra.etherscan.types import EventExtra, EventExtraData
-from izumi_infra.utils.collection_util import chunks
+from izumi_infra.utils.collection_utils import chunks
 from izumi_infra.utils.db_utils import DjangoDbConnSafeThreadPoolExecutor
 
 logger = logging.getLogger(__name__)

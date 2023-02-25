@@ -13,7 +13,7 @@ from web3.types import EventData, TxData, TxReceipt
 
 from izumi_infra.blockchain.constants import ZERO_ADDRESS
 from izumi_infra.blockchain.facade import BlockchainFacade
-from izumi_infra.utils.collection_util import merge_dict_in_list, tuple_to_typedict
+from izumi_infra.utils.collection_utils import merge_dict_in_list, tuple_to_typedict
 
 logger = logging.getLogger(__name__)
 

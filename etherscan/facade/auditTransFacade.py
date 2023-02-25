@@ -11,7 +11,7 @@ from izumi_infra.etherscan.constants import (ScanConfigAuditLevelEnum, ScanTaskS
 from izumi_infra.etherscan.facade.scanTransFacade import scan_trans_by_task
 from izumi_infra.etherscan.models import (ContractTransaction, ContractTransactionScanTask,
                                    EtherScanConfig)
-from izumi_infra.utils.collection_util import chunks
+from izumi_infra.utils.collection_utils import chunks
 
 
 logger = logging.getLogger(__name__)

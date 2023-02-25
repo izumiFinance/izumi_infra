@@ -2,7 +2,7 @@
 import logging
 
 from izumi_infra.utils.APIStatus import CommonStatus
-from izumi_infra.utils.response_util import ResponseUtil
+from izumi_infra.utils.response_utils import ResponseUtil
 from izumi_infra.utils.exceptions import BizException
 
 logger = logging.getLogger(__name__)

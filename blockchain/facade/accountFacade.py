@@ -59,7 +59,7 @@ class AccountFacade():
     def get_account_transaction_count(self) -> int:
         return self.blockchainFacade.w3.eth.get_transaction_count(self.account_address)
 
-    def build_transcation_params(self, trans_nonce:int=None) -> TxParams:
+    def build_transaction_params(self, trans_nonce:int=None) -> TxParams:
         """
         Build trans extra params, nonce will fetch latest value from chain if trans_nonce not set
         """
