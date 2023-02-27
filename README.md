@@ -163,6 +163,22 @@ EMAIL_HOST_USER = XXX
 EMAIL_HOST_PASSWORD = XXX
 ```
 
+#### system invoke
+
+You can invoke method which register by `SYSTEM_INVOKE_METHOD_LIST` in admin page, required super user permission.
+
+```py
+# django config file
+IZUMI_INFRA_EXTENSIONS = {
+    'SYSTEM_INVOKE_METHOD_LIST': (
+        # module path, method name
+        ('izumi_infra.extensions.tasks', 'get_superuser_email_list'),
+    )
+}
+```
+
+Then you invoke method at `admin/extensions/system-invoke` page.
+
 ### utils
 
 ### middleware

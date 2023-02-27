@@ -39,3 +39,14 @@ class TokenData(TypedDict):
     price_time: datetime
 
 TokenConfigType = NewType('TokenConfigType', Dict[ChainIdEnum, Dict[TokenSymbol, TokenMeta]])
+
+class TokenMetaSimple(TypedDict):
+    address: ChecksumAddress
+    symbol: TokenSymbol
+    decimal: int
+    stable: bool
+
+# TODO admin limit
+# https://github.com/jmrivas86/django-json-widget
+# https://github.com/abogushov/django-admin-json-editor
+TokenNoteType = NewType('TokenNoteType', Dict[TokenSymbol, TokenMetaSimple])

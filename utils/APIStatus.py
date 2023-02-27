@@ -8,6 +8,8 @@ class CommonStatus(StringEnum):
     INVALID_PARAMETER = "Invalid parameter"
     NOT_FOUND = "Not found"
 
+    PERMISSION_DENY = "Permission deny"
+
 # TODO other module status
 
 class EthBaseError(StringEnum):

@@ -10,6 +10,11 @@ DEFAULTS = {
     # '1.2.3.4,2.3.4.5' like, split with comma
     'ADMIN_SITE_LOGIN_WHITELIST': [ip.strip() for ip in os.environ.get("IZUMI_INFRA_EXTENSIONS.ADMIN_SITE_LOGIN_WHITELIST", '').split(',') if ip.strip()],
     'ALERT_FROM_EMAIL': os.environ.get("IZUMI_INFRA_EXTENSIONS.ALERT_FROM_EMAIL", ''),
+
+    'SYSTEM_INVOKE_METHOD_LIST': (
+        # module path, method name
+        ('izumi_infra.extensions.tasks', 'get_superuser_email_list'),
+    )
 }
 
 IMPORT_STRINGS = {

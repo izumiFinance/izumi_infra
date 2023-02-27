@@ -16,9 +16,12 @@ class Blockchain(models.Model):
 
     rpc_url = models.CharField("RPCUrl", max_length=300, default="")
     ws_rpc_url = models.CharField("WebsocketRPCUrl", max_length=300, default="", blank=True)
+    scan_url = models.CharField("ScanUrl", max_length=300, default="", blank=True)
     chain_id = models.PositiveBigIntegerField("ChainId", unique=True, primary_key=True)
 
     gas_price_wei = models.PositiveBigIntegerField("GasPriceWei", default=5_000_000_000, validators=[MaxValueValidator(100_000_000_000)])
+
+    token_note = models.JSONField("TokenNote", default=dict, blank=True)
 
     create_time = models.DateTimeField("CreateTime", auto_now_add=True)
     update_time = models.DateTimeField("UpdateTime", auto_now=True)
