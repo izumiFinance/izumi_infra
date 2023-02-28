@@ -48,6 +48,7 @@ class SystemInvokeAdmin(NonModelAdmin):
 
         method = None
         data = None
+        invoke_result = None
         # TODO better form validate
         if not post_data.get('method'):
             errors.append('method required')
