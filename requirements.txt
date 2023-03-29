@@ -1,5 +1,5 @@
 # base
-Django == 3.2.4
+Django == 3.2.18
 djangorestframework == 3.12.4
 
 # client
