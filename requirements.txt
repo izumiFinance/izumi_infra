@@ -8,7 +8,7 @@ mysqlclient == 2.0.3
 django-redis == 5.0.0
 
 # celery
-celery == 5.1.1
+celery == 5.2.2
 django_celery_beat == 2.2.0
 celery-once == 3.0.1
 

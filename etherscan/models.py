@@ -95,7 +95,7 @@ class ContractEventScanTask(models.Model):
 
     # 左闭右开
     start_block_id = models.PositiveBigIntegerField("StartBlockId")
-    end_block_id = models.PositiveBigIntegerField("EndBlockId", db_index=True)
+    end_block_id = models.PositiveBigIntegerField("EndBlockId")
 
     status = models.SmallIntegerField("Status", default=ScanTaskStatusEnum.INITIAL.value, choices=ScanTaskStatusEnum.choices())
 
@@ -110,7 +110,10 @@ class ContractEventScanTask(models.Model):
     class Meta:
         verbose_name = _("ContractEventScanTask")
         verbose_name_plural = _("ContractEventScanTasks")
-        index_together = [['contract', 'status']]
+        index_together = [
+            ['contract', 'status'],
+            ['contract', 'end_block_id'],
+        ]
 
     def __str__(self):
         return f'EventScanTsk-{self.id}'
