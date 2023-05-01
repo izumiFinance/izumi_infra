@@ -13,30 +13,31 @@ from izumi_infra.etherscan.facade.scanEventFacade import (
 from izumi_infra.etherscan.facade.scanTransFacade import \
     scan_all_contract_transactions
 from izumi_infra.utils.date_utils import PYTHON_DATE_FORMAT, dayRange
+from izumi_infra.utils.task_utils import IzumiQueueOnce
 
 logger = logging.getLogger(__name__)
 
 # TODO 多线程
 
-@shared_task(base=QueueOnce, name='etherscan_contract_trans_scan_task')
+@shared_task(base=IzumiQueueOnce, once={'log_critical': False}, name='etherscan_contract_trans_scan_task')
 def contract_trans_scan_task():
     logger.info("start etherscan contract trans scan task")
     scan_all_contract_transactions()
 
 
-@shared_task(base=QueueOnce, name='etherscan_contract_event_scan_task')
+@shared_task(base=IzumiQueueOnce, once={'log_critical': False}, name='etherscan_contract_event_scan_task')
 def contract_event_scan_task():
     logger.info("start etherscan contract event scan task")
     scan_all_contract_event()
 
 
-@shared_task(base=QueueOnce, name='etherscan_touch_unprocessed_entity_task')
+@shared_task(base=IzumiQueueOnce, name='etherscan_touch_unprocessed_entity_task')
 def etherscan_touch_unprocessed_entity_task():
     logger.info("start etherscan touch unprocessed entity task task")
     scan_and_touch_entity()
 
 
-@shared_task(base=QueueOnce, name='etherscan_audit_event_scan_task')
+@shared_task(base=IzumiQueueOnce, once={'log_critical': False}, name='etherscan_audit_event_scan_task')
 def etherscan_audit_event_scan_task(*args, **kwargs):
     audit_slice_hours = kwargs.get('audit_slice_hours', 24)
 
@@ -54,7 +55,7 @@ def etherscan_audit_event_scan_task(*args, **kwargs):
         logger.info(f"start audit event day: {datetime.strftime(audit_start_time, PYTHON_DATE_FORMAT)}")
         audit_event_entry(audit_start_time, audit_slice_hours)
 
-@shared_task(base=QueueOnce, name='etherscan_audit_trans_scan_task')
+@shared_task(base=IzumiQueueOnce, once={'log_critical': False}, name='etherscan_audit_trans_scan_task')
 def etherscan_audit_trans_scan_task(*args, **kwargs):
     audit_slice_hours = kwargs.get('audit_slice_hours', 24)
 

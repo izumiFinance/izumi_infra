@@ -16,7 +16,7 @@ class EtherScanConfig(models.Model):
     id = models.BigAutoField(primary_key=True)
 
     # 如果是 0 地址的合约，地址过滤时将使用本合约的地址
-    contract = models.ForeignKey(Contract, on_delete=models.SET_NULL, null=True, related_name = 'RelatedEtherScanConfig')
+    contract = models.ForeignKey(Contract, on_delete=models.SET_NULL, null=True, related_name='RelatedEtherScanConfig')
     scan_type = models.SmallIntegerField("ScanType", default=ScanTypeEnum.Event.value, choices=ScanTypeEnum.choices())
     scan_mode = models.SmallIntegerField("ScanMode", default=ScanModeEnum.Basic.value, choices=ScanModeEnum.choices())
 

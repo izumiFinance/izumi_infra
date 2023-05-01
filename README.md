@@ -163,6 +163,8 @@ EMAIL_HOST_USER = XXX
 EMAIL_HOST_PASSWORD = XXX
 ```
 
+4. set `ENABLE_SEND_ALERT_EMAIL` to `True` at your `IZUMI_INFRA_EXTENSIONS` config
+
 #### system invoke
 
 You can invoke method which register by `SYSTEM_INVOKE_METHOD_LIST` in admin page, required super user permission.

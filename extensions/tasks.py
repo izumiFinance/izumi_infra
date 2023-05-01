@@ -12,6 +12,8 @@ logger = logging.getLogger(__name__)
 
 @shared_task()
 def send_email_to_superuser_task(subject: str, message: str) -> None:
+    if not extensions_settings.ENABLE_SEND_ALERT_EMAIL:
+        return
     try:
         superuser_emails = get_superuser_email_list()
         admin_emails = get_admins_email_list()

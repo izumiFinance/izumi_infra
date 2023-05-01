@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from enum import Enum
 import logging
 from izumi_infra.etherscan.constants import INIT_SUB_STATUS, ProcessingStatusEnum, SubReceiverGroupEnum
 
@@ -42,3 +41,17 @@ def multi_entity_filter(group_enum: SubReceiverGroupEnum, contract_type: str, to
 
         return wrapper
     return decorator
+
+SIGNAL_PARAM_SYNC_TASK = 'signal_param_sync_task'
+
+def mark_as_sync_entity(entity):
+    """
+    set extra sync_task param to signal receiver
+    """
+    setattr(entity, SIGNAL_PARAM_SYNC_TASK, True)
+
+def is_sync_entity(entity) -> bool:
+    """
+    check extra sync_task param to signal receiver
+    """
+    return getattr(entity, SIGNAL_PARAM_SYNC_TASK, False)

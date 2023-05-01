@@ -10,6 +10,7 @@ from izumi_infra.etherscan.facade.scanTransFacade import execute_unfinished_tran
 from izumi_infra.etherscan.models import ContractEvent, ContractEventScanTask, ContractTransaction, ContractTransactionScanTask, EtherScanConfig
 
 from izumi_infra.etherscan.conf import etherscan_settings
+from izumi_infra.etherscan.utils import mark_as_sync_entity
 
 @admin.register(EtherScanConfig)
 class EtherScanConfigAdmin(admin.ModelAdmin):
@@ -122,6 +123,7 @@ class ContractEventAdmin(admin.ModelAdmin):
         order_queryset: List[ContractEvent] = queryset.order_by('block_number', 'log_index')
         for event in order_queryset:
             event.status = ProcessingStatusEnum.INITIAL
+            mark_as_sync_entity(event)
             event.save()
 
     @admin.display(description='SubStatus')
