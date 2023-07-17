@@ -56,6 +56,7 @@ class DjangoDbConnSafeThreadPoolExecutor(ThreadPoolExecutor):
 
         return super(self.__class__, self).submit(fn, *args, **kwargs)
 
+# not suggest to use
 def chunked_iterator(queryset, chunk_size=2000):
     """
     MySQL do not support streaming results for code: XxxModel.objects.all().iterator()

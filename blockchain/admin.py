@@ -17,6 +17,7 @@ class ContractAdmin(admin.ModelAdmin):
     actions = None
     list_display = ['id', 'chain', '__str__']
     readonly_fields = ['create_time', 'update_time']
+    list_filter = ['chain', 'type']
 
 @admin.register(Account)
 class AccountAdmin(admin.ModelAdmin):

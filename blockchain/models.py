@@ -47,7 +47,7 @@ class Contract(models.Model):
     class Meta:
         verbose_name = _("contract")
         verbose_name_plural = _("contract")
-        unique_together = [['chain', 'contract_address']]
+        unique_together = [['chain', 'contract_address', 'type']]
 
     def __str__(self):
         return self.name
