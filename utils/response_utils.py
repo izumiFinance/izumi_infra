@@ -96,4 +96,4 @@ class LargePagination(CommonPagination):
 class NoCountAdminPaginator(Paginator):
     @property
     def count(self):
-        return
+        return 999999999
