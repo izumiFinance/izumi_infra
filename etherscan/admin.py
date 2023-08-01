@@ -3,6 +3,8 @@ from datetime import datetime
 from typing import List
 from django.conf import settings
 from django.contrib import admin
+from django.core.paginator import Paginator
+
 from izumi_infra.etherscan.constants import INIT_SUB_STATUS, MAX_SUB_STATUS_BIT, ProcessingStatusEnum, ScanTaskStatusEnum, ScanTypeEnum
 from izumi_infra.etherscan.facade.scanEventFacade import execute_unfinished_event_scan_task, scan_contract_event_by_config
 from izumi_infra.etherscan.facade.scanTransFacade import execute_unfinished_trans_scan_task, scan_contract_transactions_by_config
@@ -11,6 +13,7 @@ from izumi_infra.etherscan.models import ContractEvent, ContractEventScanTask, C
 
 from izumi_infra.etherscan.conf import etherscan_settings
 from izumi_infra.etherscan.utils import mark_as_sync_entity
+from izumi_infra.utils.response_utils import NoCountAdminPaginator
 
 @admin.register(EtherScanConfig)
 class EtherScanConfigAdmin(admin.ModelAdmin):
@@ -18,6 +21,7 @@ class EtherScanConfigAdmin(admin.ModelAdmin):
     actions = ['do_scan_by_config']
     list_filter = ['contract', 'scan_type', 'status']
     list_display = ('__str__', 'contract', 'scan_type', 'scan_mode', 'status', 'max_deliver_retry','create_time')
+    list_select_related = ['contract',]
 
     @admin.action(description='Do scan by config')
     def do_scan_by_config(self, request, queryset: List[EtherScanConfig]):
@@ -39,6 +43,7 @@ class ContractTransactionScanTaskAdmin(admin.ModelAdmin):
     actions = ['do_scan_by_task']
     list_filter = ['status', 'contract']
     list_display = ('__str__', 'contract', 'block_range', 'status', 'create_time')
+    list_select_related = ['contract',]
     readonly_fields = ['create_time', 'update_time']
 
     search_fields = ['end_block_id']
@@ -67,9 +72,14 @@ class ContractEventScanTaskAdmin(admin.ModelAdmin):
     actions = ['do_scan_by_task']
     list_filter = ['status', 'contract']
     list_display = ('__str__', 'contract', 'block_range', 'status', 'create_time')
+    list_select_related = ['contract',]
     readonly_fields = ['create_time', 'update_time']
 
     search_fields = ['end_block_id']
+
+    # avoid count all
+    paginator = NoCountAdminPaginator if etherscan_settings.ADMIN_PAGE_FAKE_COUNT else Paginator
+    show_full_result_count = not etherscan_settings.ADMIN_PAGE_FAKE_COUNT
 
     @admin.display(ordering='start_block_id', description='Scan block range')
     def block_range(self, instance: ContractEventScanTask):
@@ -97,6 +107,7 @@ class ContractTransactionAdmin(admin.ModelAdmin):
     list_display = ['id', 'contract', 'function_name', 'status', 'block_number', 'create_time']
     readonly_fields = ['create_time']
     list_filter = ['status', 'contract']
+    list_select_related = ['contract',]
 
     search_fields = ['transaction_hash__exact']
 
@@ -113,10 +124,15 @@ class ContractEventAdmin(admin.ModelAdmin):
     list_display = ['id', 'contract', 'topic', 'status', 'get_sub_status', 'block_number', 'create_time']
     readonly_fields = ['create_time']
     list_filter = ['status', 'contract', 'topic']
+    list_select_related = ['contract',]
 
     search_fields = ['transaction_hash__exact']
 
     inlines = [] if etherscan_settings.EVENT_ADMIN_INLINES_CLASS is None else [etherscan_settings.EVENT_ADMIN_INLINES_CLASS]
+
+    # avoid count all
+    paginator = NoCountAdminPaginator if etherscan_settings.ADMIN_PAGE_FAKE_COUNT else Paginator
+    show_full_result_count = not etherscan_settings.ADMIN_PAGE_FAKE_COUNT
 
     @admin.action(description='Retouch event')
     def retouch_event(self, request, queryset: List[ContractEvent]):

@@ -5,6 +5,7 @@ from enum import Enum
 
 from django.conf import settings
 from django.http import JsonResponse
+from django.core.paginator import Paginator
 from rest_framework import pagination
 from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.response import Response
@@ -91,3 +92,8 @@ class CommonPagination(pagination.PageNumberPagination):
 
 class LargePagination(CommonPagination):
     max_page_size = 300
+
+class NoCountAdminPaginator(Paginator):
+    @property
+    def count(self):
+        return
