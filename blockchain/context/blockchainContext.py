@@ -14,6 +14,7 @@ class BlockchainContext(BaseContext):
         if not isinstance(blockchain_model, Blockchain):
             raise ValueError("only support for Blockchain model, not {}".format(blockchain_model))
         if blockchain_model.chain_id in self._instances:
+            self._instances[blockchain_model.chain_id].set_random_rpc_url()
             return self._instances[blockchain_model.chain_id]
 
         instance = self._instances.setdefault(blockchain_model.chain_id, self._build_facade(blockchain_model))

@@ -30,11 +30,14 @@ class BlockchainFacade():
         self.gas_price_wei = gas_price_wei
 
         if vm_type == BlockChainVmEnum.EVM:
-            self.w3 = Web3(Web3.HTTPProvider(random.choice(self.rpc_url), request_kwargs={'timeout': blockchain_settings.WEB3_HTTP_RPC_TIMEOUT}))
-            self.w3.middleware_onion.inject(geth_poa_middleware, layer=0)
-            self.w3.middleware_onion.inject(rpc_exception_log_middleware, layer=0)
+            self.set_random_rpc_url()
         else:
             raise NoEntriesFound("No matching entries for '{}'".format(chain_symbol))
+
+    def set_random_rpc_url(self):
+        self.w3 = Web3(Web3.HTTPProvider(random.choice(self.rpc_url), request_kwargs={'timeout': blockchain_settings.WEB3_HTTP_RPC_TIMEOUT}))
+        self.w3.middleware_onion.inject(geth_poa_middleware, layer=0)
+        self.w3.middleware_onion.inject(rpc_exception_log_middleware, layer=0)
 
     def is_connected(self) -> bool:
         return self.w3.isConnected()
