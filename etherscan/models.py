@@ -7,8 +7,8 @@ from izumi_infra.etherscan.conf import etherscan_settings
 from izumi_infra.etherscan.constants import (INIT_SUB_STATUS, MAX_SUB_STATUS_BIT, ProcessingStatusEnum,
                                              ScanConfigAuditLevelEnum,
                                              ScanConfigStatusEnum, ScanModeEnum,
-                                             ScanTaskStatusEnum, ScanTypeEnum)
-from izumi_infra.utils.model_utils import validate_checksum_address_list
+                                             ScanTaskStatusEnum, ScanTypeEnum, WhiteListTypeEnum)
+from izumi_infra.utils.model_utils import validate_checksum_address_list, validate_eth_address
 
 # Create your models here.
 
@@ -231,3 +231,21 @@ class ContractEvent(models.Model):
 
     def __str__(self):
         return f"ContractEvent-{self.id}"
+
+class WhiteList(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    
+    chain_id = models.PositiveBigIntegerField("ChainId", db_index=True)
+    type = models.SmallIntegerField("Type", choices=WhiteListTypeEnum.Swap, default=WhiteListTypeEnum.Swap)
+    contract_address = models.CharField("ContractAddress", max_length=128, default="", validators=[validate_eth_address])
+    additional_info = models.JSONField("AdditionalInfo", null=True)
+
+    create_time = models.DateTimeField("CreateTime", auto_now_add=True)
+
+    class Meta:
+        verbose_name = _("WhiteList")
+        verbose_name_plural = _("WhiteList")
+        unique_together = [['chain_id', 'contract_address']]
+
+    def __str__(self):
+        return f"WhiteList-{self.chain_id}-{self.contract_address}"

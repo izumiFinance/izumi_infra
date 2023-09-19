@@ -39,3 +39,8 @@ class TransExtra(TypedDict):
 class TokenInfo(TypedDict):
     # USD price
     price: float
+
+class  WhiteListPoolAdditionalInfo(TypedDict):
+    tokenX: str
+    tokenY: str
+    fee: int

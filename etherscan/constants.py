@@ -49,3 +49,6 @@ class SubReceiverGroupEnum(Enum):
     MAX_3_OF_0 = (3, 0)
     MAX_3_OF_1 = (3, 1)
     MAX_3_OF_2 = (3, 2)
+
+class WhiteListTypeEnum(IntegerFieldEnum):
+    Swap = 0
