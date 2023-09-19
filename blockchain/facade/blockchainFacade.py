@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import random
 from typing import List, Set, Type
 
 from eth_typing.encoding import HexStr
@@ -21,7 +22,7 @@ class BlockchainFacade():
     Blockchain ability implement
     """
 
-    def __init__(self, chain_symbol: str, vm_type: str, rpc_url: str, chain_id: int, gas_price_wei: int) -> None:
+    def __init__(self, chain_symbol: str, vm_type: str, rpc_url: List[str], chain_id: int, gas_price_wei: int) -> None:
         self.chain_symbol = chain_symbol
         self.vm_type = vm_type
         self.rpc_url = rpc_url
@@ -29,7 +30,7 @@ class BlockchainFacade():
         self.gas_price_wei = gas_price_wei
 
         if vm_type == BlockChainVmEnum.EVM:
-            self.w3 = Web3(Web3.HTTPProvider(self.rpc_url, request_kwargs={'timeout': blockchain_settings.WEB3_HTTP_RPC_TIMEOUT}))
+            self.w3 = Web3(Web3.HTTPProvider(random.choice(self.rpc_url), request_kwargs={'timeout': blockchain_settings.WEB3_HTTP_RPC_TIMEOUT}))
             self.w3.middleware_onion.inject(geth_poa_middleware, layer=0)
             self.w3.middleware_onion.inject(rpc_exception_log_middleware, layer=0)
         else:

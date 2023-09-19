@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import json
 from django.db import models
 from django.db.utils import IntegrityError
 from django.utils.translation import gettext as _
@@ -14,7 +15,7 @@ class Blockchain(models.Model):
     symbol = models.CharField("Symbol", unique=True, max_length=30, default="")
     vm_type = models.CharField("VmType", max_length=30, default=BlockChainVmEnum.EVM.value, choices=BlockChainVmEnum.choices())
 
-    rpc_url = models.CharField("RPCUrl", max_length=300, default="")
+    rpc_url = models.TextField("RPCUrl", default="")
     ws_rpc_url = models.CharField("WebsocketRPCUrl", max_length=300, default="", blank=True)
     scan_url = models.CharField("ScanUrl", max_length=300, default="", blank=True)
     chain_id = models.PositiveBigIntegerField("ChainId", unique=True, primary_key=True)
@@ -28,6 +29,12 @@ class Blockchain(models.Model):
 
     def __str__(self):
         return f"Blockchain-{self.symbol}"
+
+    def set_rpc_url(self, rpc_url_array):
+        self.rpc_url = json.dumps(rpc_url_array)
+
+    def get_rpc_url(self):
+        return json.loads(self.rpc_url)
 
 class Contract(models.Model):
     id = models.PositiveBigIntegerField(primary_key=True)

@@ -26,7 +26,7 @@ class BlockchainContext(BaseContext):
     def _build_facade(self, blockchain_model: Blockchain) -> BlockchainFacade:
         blockchain_facade = BlockchainFacade(blockchain_model.symbol,
                                              blockchain_model.vm_type,
-                                             blockchain_model.rpc_url,
+                                             blockchain_model.get_rpc_url(),
                                              blockchain_model.chain_id,
                                              blockchain_model.gas_price_wei)
         return blockchain_facade
