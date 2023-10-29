@@ -138,7 +138,7 @@ def check_undetected_trans(scan_tasks: QuerySet[ContractTransactionScanTask], au
     template_task.start_block_id = audit_block_id_range.start
     template_task.end_block_id = audit_block_id_range.stop
 
-    # TODO 很慢
+    # TODO better way
     trans = scan_trans_by_task(template_task)
     if not trans: return True
 

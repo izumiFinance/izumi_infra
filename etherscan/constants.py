@@ -21,6 +21,8 @@ class ScanConfigAuditLevelEnum(IntegerFieldEnum):
     DISABLE = 0
     ENABLE = 1
 
+SCAN_CONFIG_NO_GROUP = 0
+
 class ScanTaskStatusEnum(IntegerFieldEnum):
     INITIAL = 0
     FINISHED = 1

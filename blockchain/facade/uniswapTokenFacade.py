@@ -144,11 +144,11 @@ class UniswapTokenHourDataFacade():
         super().__init__()
         self._init_thegraph_api()
         self.token_addr_set = set()
-        # thegraph 产出时间设定
+        # thegraph produce time setting
         self.hour_data_offset = timedelta(minutes=5)
 
     def time_to_hour_end_timestamp(self, time: datetime = None) -> int:
-        # uniswap hour data 产出安全时间 10 minutes
+        # uniswap hour data safety produce time for 10 minutes
         hour_time = (time if time else datetime.now() - self.hour_data_offset) - timedelta(minutes=10)
         return int(hour_time.replace(minute=0, second=0, microsecond=0).timestamp())
 

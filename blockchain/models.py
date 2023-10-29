@@ -70,7 +70,7 @@ class Account(models.Model):
     def __str__(self):
         return self.name
 
-# TODO 非 bridge 场景下的改造
+# TODO non-bridge refactor
 class AccountContractRelationship(models.Model):
     account = models.ForeignKey(Account, on_delete=models.SET_NULL, null=True, related_name = 'Relation')
     contract = models.ForeignKey(Contract, on_delete=models.SET_NULL, null=True, related_name = 'Relation')

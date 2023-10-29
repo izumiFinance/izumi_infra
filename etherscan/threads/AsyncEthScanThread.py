@@ -81,7 +81,7 @@ class AsyncEthScanThread(Thread):
                             #     response = await ws.send(json.dumps({"id": 2, "method": "eth_unsubscribe", "params": [recv_subscription_id]}))
                             #     logger.warn(f'eth_unsubscribe: {recv_subscription_id} diff current: {subscription_id}, result {response}')
                         except asyncio.TimeoutError as e:
-                            # 需要超时机制来重连保证稳定性
+                            # timeout to re-connect
                             logger.error('SubscriptionTimeout, start reSubscription')
                             break
                         except Exception as e:

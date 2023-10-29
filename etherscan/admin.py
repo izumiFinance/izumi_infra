@@ -4,6 +4,7 @@ from typing import List
 from django.conf import settings
 from django.contrib import admin
 from django.core.paginator import Paginator
+from izumi_infra.etherscan.admin_helper import ScanConfigContractListFilter, TopicOfContractListFilter
 
 from izumi_infra.etherscan.conf import etherscan_settings
 from izumi_infra.etherscan.constants import (INIT_SUB_STATUS,
@@ -23,9 +24,9 @@ from izumi_infra.extensions.models import ApxTotalCountAdminPaginator
 
 @admin.register(EtherScanConfig)
 class EtherScanConfigAdmin(admin.ModelAdmin):
-    # TODO action 可以删掉数据
+    # TODO action delete data
     actions = ['do_scan_by_config']
-    list_filter = ['contract', 'scan_type', 'status']
+    list_filter = [ScanConfigContractListFilter, 'scan_type', 'status']
     list_display = ('__str__', 'contract', 'scan_type', 'scan_mode', 'status', 'max_deliver_retry','create_time')
     list_select_related = ['contract',]
 
@@ -76,7 +77,7 @@ class ContractTransactionScanTaskAdmin(admin.ModelAdmin):
 @admin.register(ContractEventScanTask)
 class ContractEventScanTaskAdmin(admin.ModelAdmin):
     actions = ['do_scan_by_task']
-    list_filter = ['status', 'contract']
+    list_filter = [ScanConfigContractListFilter, 'status']
     list_display = ('__str__', 'contract', 'block_range', 'status', 'create_time')
     list_select_related = ['contract',]
     readonly_fields = ['create_time', 'update_time']
@@ -124,14 +125,15 @@ class ContractTransactionAdmin(admin.ModelAdmin):
             trans.status = ProcessingStatusEnum.INITIAL
             trans.save()
 
+
 @admin.register(ContractEvent)
 class ContractEventAdmin(admin.ModelAdmin):
     actions = ['retouch_event']
     list_display = ['id', 'contract', 'topic', 'status', 'get_sub_status', 'block_number', 'create_time']
     readonly_fields = ['create_time']
 
-    # admin will opt filter with ChoicesFieldListFilter、RelatedFieldListFilter, but topic will distinct all data
-    list_filter = ['status', 'contract']
+    # TODO TopicOfContractListFilter
+    list_filter = ['status', ScanConfigContractListFilter]
     list_select_related = ['contract',]
 
     search_fields = ['transaction_hash__exact']

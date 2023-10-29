@@ -16,7 +16,7 @@ celery-once == 3.0.1
 django-cors-headers==3.7.0
 
 # blockchain
-web3 == 5.20.0
+web3 == 5.31.4
 eth-event == 1.2.3
 
 # lib

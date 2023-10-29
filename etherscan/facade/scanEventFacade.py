@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 import json
 import logging
+import traceback
 from concurrent.futures import wait
 from typing import List
-import traceback
 
 from django.db.utils import IntegrityError
 
@@ -14,8 +14,11 @@ from izumi_infra.etherscan.constants import (FILTER_SPLIT_CHAR,
                                              ScanTaskStatusEnum, ScanTypeEnum)
 from izumi_infra.etherscan.models import (ContractEvent, ContractEventScanTask,
                                           EtherScanConfig)
-from izumi_infra.etherscan.scan_utils import dict_to_EventData, get_filter_set_from_str
+from izumi_infra.etherscan.scan_utils import (dict_to_EventData,
+                                              get_filter_set_from_str,
+                                              get_sorted_chain_group_config)
 from izumi_infra.etherscan.types import EventExtra, EventExtraData
+from izumi_infra.etherscan.utils import execute_filter_func_chain
 from izumi_infra.utils.collection_utils import chunks
 from izumi_infra.utils.db_utils import DjangoDbConnSafeThreadPoolExecutor
 
@@ -27,20 +30,24 @@ def scan_all_contract_event() -> None:
     Entry for the event info sync from blockchain.
     """
 
-    event_scan_config_list = EtherScanConfig.objects.filter(
+    event_scan_config_list = EtherScanConfig.objects.select_related("contract__chain").filter(
         scan_type=ScanTypeEnum.Event,
         status=ScanConfigStatusEnum.ENABLE
     ).all()
+    event_scan_config_group = get_sorted_chain_group_config(event_scan_config_list)
 
-    # TODO, keep same chain in one queue, min(max_worker_config, chainNum)
-    max_workers = etherscan_settings.EVENT_SCAN_MAX_WORKERS
+    max_workers = min(etherscan_settings.EVENT_SCAN_MAX_WORKERS, len(event_scan_config_group.keys()))
     with DjangoDbConnSafeThreadPoolExecutor(max_workers=max_workers, thread_name_prefix='InfraEventScan') as e:
         result = []
-        for event_scan_config in event_scan_config_list:
-            r = e.submit(scan_contract_event_by_config, event_scan_config)
+        for _, config_group_list in event_scan_config_group.items():
+            r = e.submit(scan_contract_event_group, config_group_list)
             result.append(r)
 
         wait(result)
+
+def scan_contract_event_group(event_scan_config_group: List[EtherScanConfig]):
+    for scan_config in event_scan_config_group:
+        scan_contract_event_by_config(scan_config)
 
 def scan_contract_event_by_config(event_scan_config: EtherScanConfig):
     try:
@@ -144,6 +151,8 @@ def insert_contract_event(scan_config: EtherScanConfig, event_extra: List[EventE
     contract_facade = contractHolder.get_facade_by_model(scan_config.contract)
     max_deliver_retry = scan_config.max_deliver_retry
 
+    filter_list = etherscan_settings.EVENT_SCAN_MAX_WORKERS
+
     for event in event_extra:
         try:
             event_log = event['event']
@@ -160,9 +169,13 @@ def insert_contract_event(scan_config: EtherScanConfig, event_extra: List[EventE
                 'data': json.dumps(extra['data']),
                 'touch_count_remain': max_deliver_retry
             }
+
+            is_pass = execute_filter_func_chain(event_record, filter_list)
+            if not is_pass:
+                continue
+
             ContractEvent.objects.create(**event_record)
         except IntegrityError:
-            # TODO 除了约束冲突，其他情况梳理
             logger.warn(f'ignore duplicate event, block: {event_record["block_number"]}, ' \
                         f'hash: {event_record["block_hash"]}, logIndex: {event_record["log_index"]}, topic: {event_record["topic"]}')
         except Exception as e:

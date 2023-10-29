@@ -97,7 +97,7 @@ def check_uncover_scan_tasks(scan_tasks: QuerySet[ContractEventScanTask], audit_
     """
     Check scan_tasks is continuous and valid
     """
-    # TODO 可能是被归档或者close了
+    # TODO archive or close ?
     if len(scan_tasks) < 1: return True
     if len(scan_tasks) == 1: return scan_tasks.first().status == ScanTaskStatusEnum.FINISHED
     template_task = scan_tasks.first()

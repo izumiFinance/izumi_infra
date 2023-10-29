@@ -2,7 +2,6 @@
 import json
 import logging
 from datetime import datetime
-from importlib import import_module
 
 from django import forms
 from django.contrib import admin
@@ -19,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 class SystemInvokeForm(forms.Form):
     method = forms.ChoiceField(label="Invoke method",
-                               choices=[(m[1], m[1]) for m in extensions_settings.SYSTEM_INVOKE_METHOD_LIST])
+                               choices=[(m.__name__, m.__name__) for m in extensions_settings.SYSTEM_INVOKE_METHOD_LIST])
     data = forms.JSONField(label='Invoke data')
 
 
@@ -66,11 +65,9 @@ class SystemInvokeAdmin(NonModelAdmin):
         if method:
             method_list = extensions_settings.SYSTEM_INVOKE_METHOD_LIST
             try:
-                target = [m for m in  method_list if method == m[1]]
+                target = [m for m in  method_list if method == m.__name__]
                 if target:
-                    target_first = target[0]
-                    module = import_module(target_first[0])
-                    func = getattr(module, target_first[1])
+                    func = target[0]
                     if data:
                         invoke_result = func(data)
                     else:

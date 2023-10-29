@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 import logging
+from typing import Any, Callable, List
 from izumi_infra.etherscan.constants import INIT_SUB_STATUS, ProcessingStatusEnum, SubReceiverGroupEnum
 
 logger = logging.getLogger(__name__)
 
-# TODO 参数类型支持列表?
 def entity_filter(contract_type: str, topic: str = None, function_name: str = None, **kwargs):
     def decorator(func):
         def wrapper(*args, **kwargs):
@@ -55,3 +55,19 @@ def is_sync_entity(entity) -> bool:
     check extra sync_task param to signal receiver
     """
     return getattr(entity, SIGNAL_PARAM_SYNC_TASK, False)
+
+def execute_filter_func_chain(data: Any, filter_list: List[Callable]) -> bool:
+    """
+    return is abort execute
+    """
+    if not filter_list or len(filter_list) == 0:
+        return True
+    try:
+        for func in filter_list:
+            is_pass = func(data)
+            if not is_pass: return False
+    except Exception as e:
+        logger.error(e)
+        return False
+
+    return True

@@ -42,7 +42,7 @@ class BlockchainFacade():
         return self.w3.eth.contract(address=contract_address, abi=abi_json_str)
 
     def get_latest_block_number(self) -> int:
-        return self.w3.eth.get_block('latest')['number']
+        return self.w3.eth.block_number
 
     def get_event_logs(self, from_block: int, to_block: int, contract_address: str, topics: List[HexStr]):
         return self.get_all_event_logs(from_block, to_block, [contract_address], topics)

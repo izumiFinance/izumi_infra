@@ -13,12 +13,13 @@ DEFAULTS = {
     'ENABLE_SEND_ALERT_EMAIL': os.environ.get("IZUMI_INFRA_EXTENSIONS.ENABLE_SEND_ALERT_EMAIL", False),
 
     'SYSTEM_INVOKE_METHOD_LIST': (
-        # module path, method name
-        ('izumi_infra.extensions.tasks', 'get_superuser_email_list'),
+        # modulePath.methodName
+        ('izumi_infra.extensions.tasks.get_superuser_email_list'),
     )
 }
 
 IMPORT_STRINGS = {
+    'SYSTEM_INVOKE_METHOD_LIST'
 }
 
 USER_SETTING_KEY = 'IZUMI_INFRA_EXTENSIONS'

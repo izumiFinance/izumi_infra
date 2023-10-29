@@ -17,8 +17,6 @@ from izumi_infra.utils.task_utils import IzumiQueueOnce
 
 logger = logging.getLogger(__name__)
 
-# TODO 多线程
-
 @shared_task(base=IzumiQueueOnce, once={'log_critical': False}, name='etherscan_contract_trans_scan_task')
 def contract_trans_scan_task():
     logger.info("start etherscan contract trans scan task")

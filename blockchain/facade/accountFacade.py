@@ -32,7 +32,7 @@ class AccountFacade():
         Sign data and send, this method would random change
         gasPrice with offset to avoid same sign v value when conflict
         """
-        # TODO 抽象一下
+        # TODO better abstract
         try_cnt = 0
         origin_gas_price = data['gasPrice']
         while True:

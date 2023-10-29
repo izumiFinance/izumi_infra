@@ -13,6 +13,7 @@ from izumi_infra.etherscan.constants import (FILTER_SPLIT_CHAR,
 from izumi_infra.etherscan.models import (ContractTransaction,
                                           ContractTransactionScanTask,
                                           EtherScanConfig)
+from izumi_infra.etherscan.scan_utils import get_sorted_chain_group_config
 from izumi_infra.etherscan.types import TransExtra, TransExtraData
 from izumi_infra.utils.collection_utils import chunks
 from izumi_infra.utils.db_utils import DjangoDbConnSafeThreadPoolExecutor
@@ -21,25 +22,27 @@ logger = logging.getLogger(__name__)
 
 def scan_all_contract_transactions() -> None:
     """
-    Entry for the uniswap contract info sync from blockchain.
+    Entry for the trans info sync from blockchain.
     """
 
-    trans_scan_config_list = EtherScanConfig.objects.filter(
+    trans_scan_config_list = EtherScanConfig.objects.select_related("contract__chain").filter(
         scan_type=ScanTypeEnum.Transaction,
         status=ScanConfigStatusEnum.ENABLE
     ).all()
+    trans_scan_config_group = get_sorted_chain_group_config(trans_scan_config_list)
 
-    # TODO 根据下面的场景加索引
-    # TODO, keep same chain in one queue
-    # TODO, keep same chain in one queue, min(max_worker_config, chainNum)
-    max_workers = etherscan_settings.EVENT_SCAN_MAX_WORKERS
+    max_workers = min(etherscan_settings.TRANS_SCAN_MAX_WORKERS, len(trans_scan_config_group.keys()))
     with DjangoDbConnSafeThreadPoolExecutor(max_workers=max_workers, thread_name_prefix='InfraTransScan') as e:
         result = []
-        for trans_scan_config in trans_scan_config_list:
-            r = e.submit(scan_contract_transactions_by_config, trans_scan_config)
+        for _, config_group_list in trans_scan_config_group.items():
+            r = e.submit(scan_contract_transactions_group, config_group_list)
             result.append(r)
 
         wait(result)
+
+def scan_contract_transactions_group(transactions_scan_config_group: List[EtherScanConfig]):
+    for scan_config in transactions_scan_config_group:
+        scan_contract_transactions_by_config(scan_config)
 
 def scan_contract_transactions_by_config(trans_scan_config: ContractTransactionScanTask):
     try:
@@ -143,7 +146,6 @@ def insert_contract_transactions(unfinished_task :ContractTransactionScanTask, t
             }
             ContractTransaction.objects.create(**trans_record)
         except IntegrityError:
-            # TODO 除了约束冲突，其他情况梳理
             logger.warn(f'ignore duplicate block: {trans["blockNumber"]}, '\
                 f'trans: {trans["hash"].hex()}, transIndex: {trans["transactionIndex"]}')
         except Exception as e:
