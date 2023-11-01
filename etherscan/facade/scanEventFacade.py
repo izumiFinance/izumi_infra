@@ -151,7 +151,7 @@ def insert_contract_event(scan_config: EtherScanConfig, event_extra: List[EventE
     contract_facade = contractHolder.get_facade_by_model(scan_config.contract)
     max_deliver_retry = scan_config.max_deliver_retry
 
-    filter_list = etherscan_settings.EVENT_SCAN_MAX_WORKERS
+    filter_list = etherscan_settings.EVENT_FILTER_FUNCTION_LIST
 
     for event in event_extra:
         try:
@@ -172,6 +172,7 @@ def insert_contract_event(scan_config: EtherScanConfig, event_extra: List[EventE
 
             is_pass = execute_filter_func_chain(event_record, filter_list)
             if not is_pass:
+                logger.info(f'event is not pass filter, event: {event_record}')
                 continue
 
             ContractEvent.objects.create(**event_record)

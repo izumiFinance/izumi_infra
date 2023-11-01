@@ -27,7 +27,8 @@ class EtherScanConfigAdmin(admin.ModelAdmin):
     # TODO action delete data
     actions = ['do_scan_by_config']
     list_filter = [ScanConfigContractListFilter, 'scan_type', 'status']
-    list_display = ('__str__', 'contract', 'scan_type', 'scan_mode', 'status', 'max_deliver_retry','create_time')
+    list_display = ('__str__', 'contract', 'scan_type', 'scan_mode', 'status', 'scan_group',
+                    'max_deliver_retry','create_time')
     list_select_related = ['contract',]
 
     @admin.action(description='Do scan by config')
@@ -40,8 +41,8 @@ class EtherScanConfigAdmin(admin.ModelAdmin):
 
     def get_readonly_fields(self, request, obj=None):
         if obj:
-            return ['contract', 'scan_type', 'from_address_filter_list', 'to_address_filter_list', 'topic_filter_list',
-                    'function_filter_list', 'create_time', 'update_time']
+            return ['contract', 'scan_type', 'from_address_filter_list', 'to_address_filter_list',
+                    'topic_filter_list', 'function_filter_list', 'create_time', 'update_time']
         else:
             return ['create_time', 'update_time']
 
