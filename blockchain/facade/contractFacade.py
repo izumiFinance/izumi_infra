@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
 import logging
-from functools import reduce
 from typing import Dict, List, Set, Tuple, Type, TypeVar
 
 import eth_event
@@ -14,6 +13,7 @@ from web3.types import EventData, TxData, TxReceipt
 from izumi_infra.blockchain.constants import ZERO_ADDRESS
 from izumi_infra.blockchain.facade import BlockchainFacade
 from izumi_infra.utils.collection_utils import merge_dict_in_list, tuple_to_typedict
+from izumi_infra.utils.eth_utils import covert_decode_log_to_event
 
 logger = logging.getLogger(__name__)
 
@@ -107,16 +107,9 @@ class ContractFacade():
 
     def decode_event_log(self, event_log: AttributeDict):
         decode_log = eth_event.decode_log(event_log, self.topic_map)
-        event_data = reduce(lambda i, d: {**i, **self.__get_dict_from_decode_log_data(d)}, decode_log['data'], {})
+        event_data = covert_decode_log_to_event(decode_log)
 
         return event_data
-
-    def __get_dict_from_decode_log_data(self, data):
-        if data['type'] != 'tuple': return {data['name']: data['value']}
-        ret = {}
-        for i in range(len(data['components'])):
-            ret[data['components'][i]['name']] =  data['value'][i]
-        return {data['name'] : ret}
 
     def decode_trans_input(self, input_raw_data: HexStr):
         return self.contract.decode_function_input(input_raw_data)

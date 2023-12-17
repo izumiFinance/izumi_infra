@@ -26,7 +26,7 @@ from izumi_infra.extensions.models import ApxTotalCountAdminPaginator
 class EtherScanConfigAdmin(admin.ModelAdmin):
     # TODO action delete data
     actions = ['do_scan_by_config']
-    list_filter = [ScanConfigContractListFilter, 'scan_type', 'status']
+    list_filter = [ScanConfigContractListFilter, 'scan_type', 'contract__chain', 'status']
     list_display = ('__str__', 'contract', 'scan_type', 'scan_mode', 'status', 'scan_group',
                     'max_deliver_retry','create_time')
     list_select_related = ['contract',]
