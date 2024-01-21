@@ -58,14 +58,14 @@ def is_sync_entity(entity) -> bool:
 
 def execute_filter_func_chain(data: Any, filter_list: List[Callable]) -> bool:
     """
-    return is abort execute
+    return is continue execute
     """
     if not filter_list or len(filter_list) == 0:
         return True
     try:
         for func in filter_list:
-            is_pass = func(data)
-            if not is_pass: return False
+            is_continue = func(data)
+            if not is_continue: return False
     except Exception as e:
         logger.error(e)
         return False

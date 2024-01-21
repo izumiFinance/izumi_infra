@@ -39,7 +39,9 @@ def abiTypesGenerator(abi_str: str) -> str:
             _, param_type_dict_ast = composeParamTypeDictAST(e["name"] + "Event", e["inputs"])
             type_dict_ast = {**type_dict_ast, **param_type_dict_ast}
 
-    type_dict_content = TYPE_DICT_BETWEEN_SP.join([ TYPE_DICT_DEFINE_SP.join([k, *v]) for k, v in type_dict_ast.items() ])
+    content_list = [ TYPE_DICT_DEFINE_SP.join([k, *v]) for k, v in type_dict_ast.items() ]
+    # reverse list to solve decency
+    type_dict_content = TYPE_DICT_BETWEEN_SP.join(reversed(content_list))
     type_dict_content = 'from typing import TypedDict' + TYPE_DICT_BETWEEN_SP + type_dict_content
 
     return type_dict_content

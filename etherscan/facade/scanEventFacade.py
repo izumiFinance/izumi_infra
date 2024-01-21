@@ -69,6 +69,11 @@ def scan_contract_event_by_config(event_scan_config: EtherScanConfig):
             logger.exception(e)
             logger.critical(f'event scan exception: {traceback.format_exc(limit=1)}')
 
+            fallback_list = etherscan_settings.EVENT_SCAN_FALLBACK_FUNCTION_LIST
+            is_continue = execute_filter_func_chain(e, fallback_list)
+            if not is_continue:
+                logger.info(f'trigger fallback force abort task: {task}')
+                return
 
 def add_event_scan_task(event_scan_config: EtherScanConfig):
     """
@@ -170,8 +175,8 @@ def insert_contract_event(scan_config: EtherScanConfig, event_extra: List[EventE
                 'touch_count_remain': max_deliver_retry
             }
 
-            is_pass = execute_filter_func_chain(event_record, filter_list)
-            if not is_pass:
+            is_continue = execute_filter_func_chain(event_record, filter_list)
+            if not is_continue:
                 logger.info(f'event is not pass filter, event: {event_record}')
                 continue
 

@@ -8,7 +8,7 @@ from izumi_infra.etherscan.admin_helper import ScanConfigContractListFilter, Top
 
 from izumi_infra.etherscan.conf import etherscan_settings
 from izumi_infra.etherscan.constants import (INIT_SUB_STATUS,
-                                             ProcessingStatusEnum,
+                                             ProcessingStatusEnum, ScanConfigStatusEnum,
                                              ScanTypeEnum)
 from izumi_infra.etherscan.facade.scanEventFacade import (
     execute_unfinished_event_scan_task, scan_contract_event_by_config)
@@ -25,11 +25,15 @@ from izumi_infra.extensions.models import ApxTotalCountAdminPaginator
 @admin.register(EtherScanConfig)
 class EtherScanConfigAdmin(admin.ModelAdmin):
     # TODO action delete data
-    actions = ['do_scan_by_config']
+    actions = ['do_scan_by_config', 'disable_scan']
     list_filter = [ScanConfigContractListFilter, 'scan_type', 'contract__chain', 'status']
     list_display = ('__str__', 'contract', 'scan_type', 'scan_mode', 'status', 'scan_group',
                     'max_deliver_retry','create_time')
     list_select_related = ['contract',]
+
+    @admin.action(description='Disable scan')
+    def disable_scan(self, request, queryset: List[EtherScanConfig]):
+        queryset.update(status=ScanConfigStatusEnum.DISABLE)
 
     @admin.action(description='Do scan by config')
     def do_scan_by_config(self, request, queryset: List[EtherScanConfig]):
@@ -130,7 +134,7 @@ class ContractTransactionAdmin(admin.ModelAdmin):
 @admin.register(ContractEvent)
 class ContractEventAdmin(admin.ModelAdmin):
     actions = ['retouch_event']
-    list_display = ['id', 'contract', 'topic', 'status', 'get_sub_status', 'block_number', 'create_time']
+    list_display = ['id', 'contract', 'topic', 'status', 'get_sub_status', 'outer_link', 'block_number', 'create_time']
     readonly_fields = ['create_time']
 
     # TODO TopicOfContractListFilter
@@ -161,3 +165,9 @@ class ContractEventAdmin(admin.ModelAdmin):
             return 'ALL_DONE'
         else:
             return format(contractEvent.sub_status, '08b')
+
+    @admin.display(description='OuterLink')
+    def outer_link(self, contractEvent: ContractEvent):
+        outer_link_func = etherscan_settings.EVENT_ADMIN_OUTER_LINK_FUNC
+        if not etherscan_settings.EVENT_ADMIN_OUTER_LINK_FUNC: return None
+        return outer_link_func(contractEvent)

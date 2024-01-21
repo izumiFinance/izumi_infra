@@ -6,6 +6,7 @@ from functools import wraps
 from concurrent.futures import ThreadPoolExecutor
 from django.db import connection
 from django.core.paginator import Paginator
+from django.db.models import Q
 
 _Z = TypeVar("_Z")
 
@@ -78,3 +79,17 @@ def order_chunked_iterator(queryset: QueryType, init_pk=-1, chunk_size=2000):
         fetch_size = len(data)
         if fetch_size > 0: last_pk = data[fetch_size-1].pk
         yield data
+
+def remove_filter(lookup: str, queryset: QueryType):
+    """
+    modify queryset, remove lookup condition
+    example: remove_filter('id', User.objects.filter(id=1, age=2)) is equals User.objects.filter(age=2)
+    """
+    query = queryset.query
+    q = Q(**{lookup: None})
+    clause, _ = query._add_q(q, query.used_aliases)
+
+    def filter_lookups(child):
+        return child.lhs.target != clause.children[0].lhs.target
+
+    query.where.children = list(filter(filter_lookups, query.where.children))
