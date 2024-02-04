@@ -9,7 +9,7 @@ from izumi_infra.etherscan.facade.auditEventFacade import audit_event_entry
 from izumi_infra.etherscan.facade.auditTransFacade import audit_trans_entry
 from izumi_infra.etherscan.facade.scanEntityFacade import scan_and_touch_entity
 from izumi_infra.etherscan.facade.scanEventFacade import (
-    insert_contract_event_from_dict, scan_all_contract_event)
+    insert_contract_event_from_dict, scan_all_contract_event, scan_all_contract_event_isolate)
 from izumi_infra.etherscan.facade.scanTransFacade import \
     scan_all_contract_transactions
 from izumi_infra.utils.date_utils import PYTHON_DATE_FORMAT, dayRange
@@ -24,10 +24,16 @@ def contract_trans_scan_task():
 
 
 @shared_task(base=IzumiQueueOnce, once={'log_critical': False}, name='etherscan_contract_event_scan_task')
-def contract_event_scan_task():
-    logger.info("start etherscan contract event scan task")
-    scan_all_contract_event()
+def contract_event_scan_task(*args, **kwargs):
+    exclude_chains = kwargs.get('exclude_chains', [])
+    logger.info(f"start etherscan contract event scan task, {exclude_chains=}")
+    scan_all_contract_event(exclude_chains)
 
+@shared_task(base=IzumiQueueOnce, once={'log_critical': False}, name='etherscan_contract_event_scan_task_isolate')
+def contract_event_scan_task_isolate(*args, **kwargs):
+    include_chains = kwargs.get('include_chains', [])
+    logger.info(f"start etherscan contract event scan task isolate, {include_chains=}")
+    scan_all_contract_event_isolate(include_chains)
 
 @shared_task(base=IzumiQueueOnce, name='etherscan_touch_unprocessed_entity_task')
 def etherscan_touch_unprocessed_entity_task():

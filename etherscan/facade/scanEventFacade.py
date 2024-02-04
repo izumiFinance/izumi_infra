@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
 import logging
+import time
 import traceback
 from concurrent.futures import wait
 from typing import List
@@ -25,14 +26,34 @@ from izumi_infra.utils.db_utils import DjangoDbConnSafeThreadPoolExecutor
 logger = logging.getLogger(__name__)
 
 
-def scan_all_contract_event() -> None:
+def scan_all_contract_event(exclude_chains=[]) -> None:
     """
     Entry for the event info sync from blockchain.
     """
 
     event_scan_config_list = EtherScanConfig.objects.select_related("contract__chain").filter(
         scan_type=ScanTypeEnum.Event,
-        status=ScanConfigStatusEnum.ENABLE
+        status=ScanConfigStatusEnum.ENABLE,
+    ).exclude(contract__chain_id__in=exclude_chains).all()
+    event_scan_config_group = get_sorted_chain_group_config(event_scan_config_list)
+
+    max_workers = min(etherscan_settings.EVENT_SCAN_MAX_WORKERS, len(event_scan_config_group.keys()))
+    with DjangoDbConnSafeThreadPoolExecutor(max_workers=max_workers, thread_name_prefix='InfraEventScan') as e:
+        result = []
+        for _, config_group_list in event_scan_config_group.items():
+            r = e.submit(scan_contract_event_group, config_group_list)
+            result.append(r)
+
+        wait(result)
+
+def scan_all_contract_event_isolate(include_chains=[]) -> None:
+    """
+    Entry for the event info sync from blockchain.
+    """
+    event_scan_config_list = EtherScanConfig.objects.select_related("contract__chain").filter(
+        scan_type=ScanTypeEnum.Event,
+        status=ScanConfigStatusEnum.ENABLE,
+        contract__chain_id__in=include_chains
     ).all()
     event_scan_config_group = get_sorted_chain_group_config(event_scan_config_list)
 
@@ -47,7 +68,10 @@ def scan_all_contract_event() -> None:
 
 def scan_contract_event_group(event_scan_config_group: List[EtherScanConfig]):
     for scan_config in event_scan_config_group:
+        tic = time.perf_counter()
         scan_contract_event_by_config(scan_config)
+        toc = time.perf_counter()
+        logger.info(f"event scan {scan_config=}, cost: {toc - tic:0.4f} s")
 
 def scan_contract_event_by_config(event_scan_config: EtherScanConfig):
     try:
