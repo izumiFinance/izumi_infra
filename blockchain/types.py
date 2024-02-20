@@ -30,6 +30,7 @@ class Erc20TokenInfo(TypedDict):
     address: str
     symbol: str
     decimals: int
+    totalSupply: int
 
 class TokenData(TypedDict):
     address: str

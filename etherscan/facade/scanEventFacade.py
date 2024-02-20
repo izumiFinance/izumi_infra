@@ -56,7 +56,6 @@ def scan_all_contract_event_isolate(include_chains=[]) -> None:
         contract__chain_id__in=include_chains
     ).all()
 
-    # TODO 并行执行一个 scan task？
     max_workers = min(etherscan_settings.EVENT_SCAN_MAX_WORKERS, len(event_scan_config_list))
     with DjangoDbConnSafeThreadPoolExecutor(max_workers=max_workers, thread_name_prefix='InfraEventScanIso') as e:
         result = []
@@ -232,9 +231,9 @@ def insert_contract_event(scan_config: EtherScanConfig, event_extra: List[EventE
                 continue
 
             entity = ContractEvent(**event_record)
-            mark_as_sync_entity(entity)
+            if not etherscan_settings.EVENT_SCAN_ENABLE_ASYNC_SIGNAL:
+                mark_as_sync_entity(entity)
             entity.save()
-            # ContractEvent.objects.create(**event_record)
         except IntegrityError:
             logger.warn(f'ignore duplicate event, block: {event_record["block_number"]}, ' \
                         f'hash: {event_record["block_hash"]}, logIndex: {event_record["log_index"]}, topic: {event_record["topic"]}')

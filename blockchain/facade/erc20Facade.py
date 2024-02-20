@@ -19,7 +19,9 @@ def get_erc20_token_info(chain_id: int, token_addr: str) -> Erc20TokenInfo:
     token_symbol = tokenContract.contract.functions.symbol().call()
     token_decimals = tokenContract.contract.functions.decimals().call()
     name = tokenContract.contract.functions.name().call()
-    return Erc20TokenInfo(address=token_addr, symbol=token_symbol, decimals=token_decimals, name=name)
+    totalSupply = tokenContract.contract.functions.totalSupply().call()
+    return Erc20TokenInfo(address=token_addr, symbol=token_symbol, decimals=token_decimals,
+                          name=name, totalSupply=totalSupply)
 
 def get_erc20_token_balance(chain_id: int, token_addr: str, account_addr: str, decimal: int=None) -> float:
     try:
