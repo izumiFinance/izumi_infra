@@ -67,6 +67,9 @@ class BlockchainFacade():
     def get_full_block_info_by_id(self, block_id: int):
         return self.w3.eth.get_block(block_id, full_transactions=True)
 
+    def get_block_info_by_id(self, block_id: int):
+        return self.w3.eth.get_block(block_id, full_transactions=False)
+
     def get_transactions_by_to_set(self, from_block: int, to_block: int, to_set: Set[str]) -> List[TxData]:
         """
         Get contract transactions

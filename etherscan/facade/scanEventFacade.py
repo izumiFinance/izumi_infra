@@ -55,23 +55,50 @@ def scan_all_contract_event_isolate(include_chains=[]) -> None:
         status=ScanConfigStatusEnum.ENABLE,
         contract__chain_id__in=include_chains
     ).all()
-    event_scan_config_group = get_sorted_chain_group_config(event_scan_config_list)
 
-    max_workers = min(etherscan_settings.EVENT_SCAN_MAX_WORKERS, len(event_scan_config_group.keys()))
+    # TODO 并行执行一个 scan task？
+    max_workers = min(etherscan_settings.EVENT_SCAN_MAX_WORKERS, len(event_scan_config_list))
     with DjangoDbConnSafeThreadPoolExecutor(max_workers=max_workers, thread_name_prefix='InfraEventScanIso') as e:
         result = []
-        for _, config_group_list in event_scan_config_group.items():
-            r = e.submit(scan_contract_event_group, config_group_list)
-            result.append(r)
+        for event_scan_config in event_scan_config_list:
+            tasks = get_scan_contract_event_by_config(event_scan_config)
+            logger.info(f'put {len(tasks)} task to scan_all_contract_event_isolate for {event_scan_config}')
+            for task in tasks:
+                r = e.submit(execute_unfinished_event_scan_task_wrapper, task)
+                result.append(r)
 
         wait(result)
 
 def scan_contract_event_group(event_scan_config_group: List[EtherScanConfig]):
     for scan_config in event_scan_config_group:
         tic = time.perf_counter()
+
         scan_contract_event_by_config(scan_config)
+
         toc = time.perf_counter()
-        logger.info(f"event scan {scan_config=}, cost: {toc - tic:0.4f} s")
+        cost = toc - tic
+        if cost > etherscan_settings.EVENT_SCAN_COST_THR:
+            logger.info(f"event scan {scan_config=}, cost: {cost:0.4f} s")
+
+def get_scan_contract_event_by_config(event_scan_config: EtherScanConfig):
+    try:
+        add_event_scan_task(event_scan_config)
+    except Exception as e:
+        logger.error(f"scan_contract_event_by_config exception for task: {event_scan_config}")
+        logger.exception(e)
+
+    return ContractEventScanTask.objects.filter(
+        contract=event_scan_config.contract,
+        status=ScanTaskStatusEnum.INITIAL
+    )
+
+def execute_unfinished_event_scan_task_wrapper(task: ContractEventScanTask) -> None:
+    try:
+        execute_unfinished_event_scan_task(task)
+    except Exception as e:
+        logger.error(f"execute_unfinished_event_scan_task_wrapper error, task: {task}")
+        logger.exception(e)
+        logger.critical(f'event scan exception: {traceback.format_exc(limit=1)}')
 
 def scan_contract_event_by_config(event_scan_config: EtherScanConfig):
     try:
@@ -211,7 +238,6 @@ def insert_contract_event(scan_config: EtherScanConfig, event_extra: List[EventE
         except IntegrityError:
             logger.warn(f'ignore duplicate event, block: {event_record["block_number"]}, ' \
                         f'hash: {event_record["block_hash"]}, logIndex: {event_record["log_index"]}, topic: {event_record["topic"]}')
-            raise BaseException()
         except Exception as e:
             failed_count = failed_count + 1
             logger.exception(e)
