@@ -15,7 +15,7 @@ class BlockchainAdmin(admin.ModelAdmin):
 @admin.register(Contract)
 class ContractAdmin(admin.ModelAdmin):
     actions = None
-    list_display = ['id', 'chain', '__str__']
+    list_display = ['id', 'chain', '__str__', 'contract_address']
     list_select_related = ['chain',]
     readonly_fields = ['create_time', 'update_time']
     list_filter = ['chain', 'type']

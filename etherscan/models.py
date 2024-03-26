@@ -140,7 +140,7 @@ class ContractTransaction(models.Model):
     status = models.SmallIntegerField("ProcessStatusStatus", default=ProcessingStatusEnum.INITIAL.value, choices=ProcessingStatusEnum.choices())
     sub_status = models.SmallIntegerField("ProcessSubStatus", default=INIT_SUB_STATUS)
     touch_count_remain = models.IntegerField("TouchCountRemain", default=0)
-    create_time = models.DateTimeField("CreateTime", auto_now_add=True)
+    create_time = models.DateTimeField("CreateTime", auto_now_add=True, db_index=True)
     # block_time = models.DateTimeField("BlockTime")
 
     def update_status(self, status_enum: ProcessingStatusEnum):
@@ -197,7 +197,7 @@ class ContractEvent(models.Model):
     status = models.SmallIntegerField("ProcessStatus", default=ProcessingStatusEnum.INITIAL.value, choices=ProcessingStatusEnum.choices())
     sub_status = models.IntegerField("ProcessSubStatus", default=INIT_SUB_STATUS)
     touch_count_remain = models.IntegerField("TouchCountRemain", default=0)
-    create_time = models.DateTimeField("CreateTime", auto_now_add=True)
+    create_time = models.DateTimeField("CreateTime", auto_now_add=True, db_index=True)
     # block_time = models.DateTimeField("BlockTime")
 
     def update_status(self, status_enum: ProcessingStatusEnum):
