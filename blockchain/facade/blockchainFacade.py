@@ -52,14 +52,14 @@ class BlockchainFacade():
     def get_all_event_logs(self, from_block: int, to_block: int, contract_addr_list: List[str], topics: List[HexStr]):
         block_range_partition = list(chunks(range(from_block, to_block), etherscan_settings.ETH_MAX_SCAN_BLOCK))
         all_info = []
+        param = {}
+        if contract_addr_list: param['address'] = contract_addr_list
+        if topics: param['topics'] = [topics]
         if from_block == to_block: block_range_partition = [range(from_block, to_block)]
         for block_range in block_range_partition:
-            event_logs = self.w3.eth.get_logs({
-                'fromBlock': block_range.start,
-                'toBlock': block_range.stop,
-                'address': contract_addr_list,
-                'topics': [topics]
-            })
+            param['fromBlock'] = block_range.start
+            param['toBlock'] = block_range.stop
+            event_logs = self.w3.eth.get_logs(param)
             all_info.extend(event_logs)
 
         return all_info

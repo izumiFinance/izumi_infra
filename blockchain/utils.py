@@ -19,3 +19,6 @@ def sort_addr(addr0: str, addr1: str):
 
 def build_chain_id_and_token_addr_lookup_dict(tokenConfig: TokenConfigType) -> Dict[str, TokenMeta]:
     return { c: { t['address']: t for t in v.values() } for c, v in tokenConfig.items() }
+
+def ascii_escape_str(unsafe_str: str) -> str:
+    return unsafe_str.encode('ascii', 'ignore').decode('ascii')

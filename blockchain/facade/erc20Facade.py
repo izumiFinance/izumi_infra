@@ -9,6 +9,7 @@ from izumi_infra.blockchain.constants import BaseContractInfoEnum
 from izumi_infra.blockchain.context import blockchainHolder, contractHolder
 from izumi_infra.blockchain.models import Blockchain, Contract
 from izumi_infra.blockchain.types import Erc20TokenInfo
+from izumi_infra.blockchain.utils import ascii_escape_str
 
 logger = logging.getLogger(__name__)
 
@@ -16,9 +17,9 @@ logger = logging.getLogger(__name__)
 def get_erc20_token_info(chain_id: int, token_addr: str) -> Erc20TokenInfo:
     blockchain = Blockchain.objects.get(chain_id=chain_id)
     tokenContract = contractHolder.get_facade_by_info(blockchain, to_checksum_address(token_addr), BaseContractInfoEnum.ERC20.abi)
-    token_symbol = tokenContract.contract.functions.symbol().call()
+    token_symbol = ascii_escape_str(tokenContract.contract.functions.symbol().call())
     token_decimals = tokenContract.contract.functions.decimals().call()
-    name = tokenContract.contract.functions.name().call()
+    name = ascii_escape_str(tokenContract.contract.functions.name().call())
     totalSupply = tokenContract.contract.functions.totalSupply().call()
     return Erc20TokenInfo(address=token_addr, symbol=token_symbol, decimals=token_decimals,
                           name=name, totalSupply=totalSupply)
