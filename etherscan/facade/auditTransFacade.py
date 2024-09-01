@@ -11,7 +11,7 @@ from izumi_infra.etherscan.constants import (ScanConfigAuditLevelEnum, ScanTaskS
 from izumi_infra.etherscan.facade.scanTransFacade import scan_trans_by_task
 from izumi_infra.etherscan.models import (ContractTransaction, ContractTransactionScanTask,
                                    EtherScanConfig)
-from izumi_infra.utils.collection_utils import chunks
+from izumi_infra.utils.collection_utils import batched, chunks
 
 
 logger = logging.getLogger(__name__)
@@ -143,9 +143,14 @@ def check_undetected_trans(scan_tasks: QuerySet[ContractTransactionScanTask], au
     if not trans: return True
 
     trans_hash_to_trans_dict = dict(map(lambda t: (t['trans']['hash'] .hex(), t), trans))
-    detected_trans = ContractTransaction.objects.filter(
-        transaction_hash__in=trans_hash_to_trans_dict.keys()
-    ).values('transaction_hash').all()
+    tx_hash_set = trans_hash_to_trans_dict.keys()
+
+    detected_trans = []
+    for tx_hash in batched(tx_hash_set, 200):
+        trans = ContractTransaction.objects.filter(
+            transaction_hash__in=tx_hash
+        ).values('transaction_hash').all()
+        detected_trans.extend(trans)
 
     if len(detected_trans) == len(trans_hash_to_trans_dict):
         return True

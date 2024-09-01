@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from functools import reduce
 from typing import Dict, Any, List, Tuple, TypeVar, Type, _TypedDictMeta, _GenericAlias
+from itertools import islice
 
 def chunks(lst: range, n: int) -> List[range]:
     """
@@ -47,3 +48,12 @@ def tuple_to_typedict(data_tuple: Tuple, type_class: Type[T]) -> T:
             inst[key] = v
 
     return inst
+
+def batched(iterable, n):
+    "Batch data into lists of length n. The last batch may be shorter."
+    # batched('ABCDEFG', 3) --> ABC DEF G
+    if n < 1:
+        raise ValueError('n must be >= 1')
+    it = iter(iterable)
+    while (batch := list(islice(it, n))):
+        yield batch
