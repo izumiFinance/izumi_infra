@@ -25,3 +25,7 @@ cachetools==5.3.1
 django-simple-captcha==0.5.14
 pillow==9.5.0
 pygments
+
+# recommend
+# mycli==1.27.2
+# iredis==1.13.2
