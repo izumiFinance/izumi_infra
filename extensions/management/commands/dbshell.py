@@ -40,7 +40,7 @@ class Command(dbshell.Command):
 
     def handle(self, **options):
         connection: DatabaseWrapper = connections[options.get('database')]
-        if connection.vendor == 'mysql' and shutil.which(DatabaseClient.executable_name) is not None:
+        if connection.vendor == 'mysql' and shutil.which(MyCLIDatabaseClient.executable_name) is not None:
             MyCLIDatabaseClient.wrapper(DatabaseClient)
 
         super(Command, self).handle(**options)

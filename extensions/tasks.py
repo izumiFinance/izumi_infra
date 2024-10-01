@@ -19,7 +19,7 @@ def send_email_to_superuser_task(subject: str, message: str) -> None:
         admin_emails = get_admins_email_list()
         target_emails = [*superuser_emails, *admin_emails]
         if not target_emails:
-            logger.warn('miss superuser of email for sending')
+            logger.warning('miss superuser of email for sending')
             return
 
         from_email_addr_list = [

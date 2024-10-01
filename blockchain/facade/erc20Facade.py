@@ -38,7 +38,7 @@ def get_erc20_token_balance(chain_id: int, token_addr: str, account_addr: str, d
         return balance_decimal / (10 ** token_decimal)
     except Exception as e:
         logger.exception(e)
-        logger.warn(f'get_erc20_token_balance error: {chain_id}, {token_addr}, {account_addr}')
+        logger.warning(f'get_erc20_token_balance error: {chain_id}, {token_addr}, {account_addr}')
         raise e
 
 @cached(cache=LRUCache(maxsize=1024))
@@ -52,7 +52,7 @@ def get_erc20_token_hist_balance(chain_id: int, token_addr: str, account_addr: s
     except Exception as e:
         # may raise error when account not exist
         logger.exception(e)
-        logger.warn(f'get_erc20_token_hist_balance error: {chain_id}, {token_addr}, {account_addr}, {block_id}')
+        logger.warning(f'get_erc20_token_hist_balance error: {chain_id}, {token_addr}, {account_addr}, {block_id}')
         return 0
 
     return balance_decimal / (10 ** token_info['decimals'])

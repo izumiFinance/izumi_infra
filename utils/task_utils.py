@@ -46,7 +46,7 @@ def clean_celery_once_redis_lock():
     # worker crash down, lock still exist
     # TODO maybe fatal error when one of multi worker crash
     for key in once_redis.scan_iter("qo_*"):
-        logger.warn(f'clean celery once key: {key}')
+        logger.warning(f'clean celery once key: {key}')
         once_redis.delete(key)
 
 class IzumiQueueOnce(QueueOnce):

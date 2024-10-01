@@ -19,7 +19,7 @@ class IzumiAuthenticationForm(AuthenticationForm):
             request_ip = self.request.META.get('REMOTE_ADDR') if not x_forward else x_forward.split(',')[0]
             logger.info(f"admin login with ip: {request_ip}")
             if request_ip not in extensions_settings.ADMIN_SITE_LOGIN_WHITELIST:
-                logger.warn(f"admin login forbidden by ip: {request_ip}")
+                logger.warning(f"admin login forbidden by ip: {request_ip}")
                 raise ValidationError(
                     'forbidden login',
                     code='forbidden',

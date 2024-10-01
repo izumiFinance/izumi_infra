@@ -79,7 +79,7 @@ class AsyncEthScanThread(Thread):
                             # recv_subscription_id = message_dict['params']['subscription']
                             # if subscription_id != recv_subscription_id:
                             #     response = await ws.send(json.dumps({"id": 2, "method": "eth_unsubscribe", "params": [recv_subscription_id]}))
-                            #     logger.warn(f'eth_unsubscribe: {recv_subscription_id} diff current: {subscription_id}, result {response}')
+                            #     logger.warning(f'eth_unsubscribe: {recv_subscription_id} diff current: {subscription_id}, result {response}')
                         except asyncio.TimeoutError as e:
                             # timeout to re-connect
                             logger.error('SubscriptionTimeout, start reSubscription')

@@ -93,7 +93,7 @@ class NonModelAdmin(admin.ModelAdmin, metaclass=FakeModelClass):
 
     @csrf_protect_m
     def add_view(self, request, form_url='', extra_context=None):
-        logger.warn('nothing impl for add_view')
+        logger.warning('nothing impl for add_view')
         return self.changelist_view(request, extra_context)
 
     @classmethod
