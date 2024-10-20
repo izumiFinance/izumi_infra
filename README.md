@@ -125,6 +125,9 @@ features:
 - `cleanup` reset database for django project initial
 - `loaddatax` load fixtures data with ignore
 - `sqldiff` show different of schema between database and django model
+- `dbshell`
+- `iredis`
+- `addotp`
 
 #### async log for sending alert email
 
@@ -180,6 +183,19 @@ IZUMI_INFRA_EXTENSIONS = {
 ```
 
 Then you invoke method at `admin/extensions/system-invoke` page.
+
+#### file browser
+
+At `admin/extensions/file-browser/`, you can list download or delete file in dir by config:
+
+```py
+# django config file
+IZUMI_INFRA_EXTENSIONS = {
+    'FILE_BROWSER_PATH': 'PATH_TO_BROWSER_FILES'
+}
+```
+
+#### admin login 2FA with OTP
 
 ### utils
 

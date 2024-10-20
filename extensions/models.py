@@ -1,9 +1,14 @@
 # -*- coding: utf-8 -*-
 import logging
+from typing import Union
+
 from django.db import models
 from django.db.models.sql.query import Query
 from django.core.paginator import Paginator
 from django.utils.functional import cached_property
+from django.utils.translation import gettext as _
+
+from izumi_infra.extensions.constants import CommonSettingKeyEnum, CommonSettingStatusEnum
 
 logger = logging.getLogger(__name__)
 
@@ -45,3 +50,23 @@ class ApxTotalCountAdminPaginator(Paginator):
         # TODO multi db type support
         # return TableHelper.get_mysql_table_approximate_rows(self.object_list.model)
         return TableHelper.get_mysql_table_explain_rows(self.object_list.query)
+
+class CommonSetting(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    create_time = models.DateTimeField("CreateTime", auto_now_add=True)
+    update_time = models.DateTimeField("UpdateTime", auto_now=True)
+    name = models.CharField("Name", max_length=128)
+
+    key = models.CharField("Key", max_length=128, null=False, blank=False, unique=True)
+    value = models.TextField("Value", null=True, blank=True)
+
+    status = models.SmallIntegerField("Status", default=CommonSettingStatusEnum.ENABLE.value, choices=CommonSettingStatusEnum.choices())
+    value_type = models.CharField("ValueType", max_length=128)
+
+    class Meta:
+        verbose_name = _("CommonSetting")
+
+    @classmethod
+    def get_setting(cls: 'CommonSetting', key: CommonSettingKeyEnum) -> Union[str, None]:
+        setting = cls.objects.filter(key=key, status=CommonSettingStatusEnum.ENABLE).first()
+        return None if not setting else setting.value

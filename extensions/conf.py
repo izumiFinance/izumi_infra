@@ -15,7 +15,8 @@ DEFAULTS = {
     'SYSTEM_INVOKE_METHOD_LIST': (
         # modulePath.methodName
         ('izumi_infra.extensions.tasks.get_superuser_email_list'),
-    )
+    ),
+    'FILE_BROWSER_PATH': os.environ.get("IZUMI_INFRA_EXTENSIONS.FILE_BROWSER_PATH", '../volumes/store/'),
 }
 
 IMPORT_STRINGS = {

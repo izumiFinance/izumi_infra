@@ -152,6 +152,7 @@ def execute_unfinished_event_scan_task(unfinished_task: ContractEventScanTask) -
     if unfinished_task.status != ScanTaskStatusEnum.INITIAL: return
 
     event_extra = scan_event_by_task(unfinished_task)
+    # TODO batch process
     is_all_success = insert_contract_event(unfinished_task.scan_config, event_extra)
 
     if is_all_success:
@@ -235,7 +236,7 @@ def insert_contract_event(scan_config: EtherScanConfig, event_extra: List[EventE
                 mark_as_sync_entity(entity)
             entity.save()
         except IntegrityError:
-            logger.warn(f'ignore duplicate event, block: {event_record["block_number"]}, ' \
+            logger.warning(f'ignore duplicate event, block: {event_record["block_number"]}, ' \
                         f'hash: {event_record["block_hash"]}, logIndex: {event_record["log_index"]}, topic: {event_record["topic"]}')
         except Exception as e:
             failed_count = failed_count + 1

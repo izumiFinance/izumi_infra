@@ -1,0 +1,71 @@
+{% extends "admin/change_list.html" %}
+{% block object-tools-items %}
+    <li>
+        <form action="upload/" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="file" name="filename" id="upload_file" required>
+            <input type="submit" value="UploadFile">
+        </form>
+    </li>
+{% endblock %}
+{% block result_list %}
+<div class="results">
+  <h2>FilePath: {{ store_path }}</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>
+          <div class="text">
+            <a>FileName</a>
+          </div>
+        </th>
+        <th>
+          <div class="text">
+            <a>Size</a>
+          </div>
+        </th>
+        <th>
+          <div class="text">
+            <a>CreateTime</a>
+          </div>
+        </th>
+        <th>
+          <div class="text">
+            <a>UpdateTime</a>
+          </div>
+        </th>
+        <th>
+          <div class="text">
+            <a>Action</a>
+          </div>
+        </th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {% for file in file_context %}
+      <tr class="{% cycle 'row1' 'row2' %}">
+        <td>{{ file.name }}</td>
+        <td>{{ file.size }}</td>
+        <td>{{ file.create_time }}</td>
+        <td>{{ file.update_time }}</td>
+        <td>
+          <a
+            class="button"
+            href="download/?fpath={{ file.name | urlencode:'' }}"
+            download
+            >Download</a
+          >
+          <a
+            class="button"
+            onclick="return confirm('Delete {{file.name}} ?');"
+            href="delete/?fpath={{ file.name | urlencode:'' }}"
+            >Delete</a
+          >
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

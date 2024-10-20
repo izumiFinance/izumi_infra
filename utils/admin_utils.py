@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 import json
 import logging
+import os
 
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import csrf_protect_m
 from django.forms.forms import MediaDefiningClass
 from django.utils.safestring import mark_safe
+from izumi_infra.extensions.conf import extensions_settings
+
 from pygments import highlight
 from pygments.formatters import HtmlFormatter
 from pygments.lexers import JsonLexer
@@ -142,3 +145,31 @@ def register(*models, site=None):
 
     return _model_admin_wrapper
 
+
+try:
+    from os import scandir
+except ImportError:
+    from scandir import scandir
+
+def scan_file_tree(path):
+    """Recursively yield DirEntry objects for given directory."""
+    for entry in scandir(path):
+        if entry.is_dir(follow_symlinks=False):
+            yield from scan_file_tree(entry.path)
+        else:
+            yield entry
+
+def readable_size(size, precision=2):
+    suffixes=['B','KB','MB','GB','TB']
+    suffixIndex = 0
+    while size >= 1024 and len(suffixes):
+        suffixIndex += 1
+        size = size/1024.0
+    return "%.*f%s"%(precision, size, suffixes[suffixIndex])
+
+def save_content_to_store(filename: str, content: str) -> str:
+    fpath = os.path.join(extensions_settings.FILE_BROWSER_PATH, filename)
+    with open(fpath, 'w+') as f:
+        f.write(content)
+
+    return fpath
