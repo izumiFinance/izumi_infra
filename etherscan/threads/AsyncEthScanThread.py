@@ -59,35 +59,54 @@ class AsyncEthScanThread(Thread):
             # 2 dem array as or condition
             subscribe_filter['topics'] = [topics]
 
+            backoff = 1
+            max_attempts = 5
+            attempt_count = 0
+
             while True:
-                async with connect(ws_rpc_url, ping_interval=None) as ws:
-                    await ws.send(json.dumps({"id": 1, "method": "eth_subscribe", "params": ["logs", subscribe_filter]}))
-                    subscription_response = await ws.recv()
-                    logger.info(f'scan_config_id: {scan_config_id}, subscription response: {subscription_response}')
-                    subscription_data = json.loads(subscription_response)
-                    if 'result' not in subscription_data:
-                        logger.error(f'scan_config_id: {scan_config_id}, subscribe_filter: {subscribe_filter}, subscribe fail with: {subscription_response}')
-                        return
+                try:
+                    async with connect(ws_rpc_url, ping_interval=20, ping_timeout=10) as ws:
+                        await ws.send(json.dumps({"jsonrpc":"2.0", "id": 1, "method": "eth_subscribe", "params": ["logs", subscribe_filter]}))
+                        subscription_response = await ws.recv()
+                        logger.info(f'scan_config_id: {scan_config_id}, subscription response: {subscription_response}')
+                        subscription_data = json.loads(subscription_response)
+                        if 'result' not in subscription_data or subscription_data['result']==None:
+                            logger.error(f'scan_config_id: {scan_config_id}, subscribe_filter: {subscribe_filter}, subscribe fail with: {subscription_response}')
+                            attempt_count += 1
+                            if attempt_count >= max_attempts:
+                                logger.error(f"Exceeded maximum attempts for scan_config_id: {scan_config_id}. Aborting.")
+                                return
+                            await asyncio.sleep(backoff)
+                            backoff = min(backoff * 2, 60)
+                            continue
 
-                    while True:
-                        try:
-                            message = await asyncio.wait_for(ws.recv(), timeout=etherscan_settings.ASYNC_EVENT_SCANT_CONN_TIMEOUT_SEC)
+                        attempt_count = 0
+                        backoff = 1
 
-                            # TODO: reactor pass msg to another thread?
-                            etherscan_async_event_save.delay(scan_config_id, message)
+                        while True:
+                            try:
+                                message = await asyncio.wait_for(ws.recv(), timeout=None)
 
-                            # recv_subscription_id = message_dict['params']['subscription']
-                            # if subscription_id != recv_subscription_id:
-                            #     response = await ws.send(json.dumps({"id": 2, "method": "eth_unsubscribe", "params": [recv_subscription_id]}))
-                            #     logger.warning(f'eth_unsubscribe: {recv_subscription_id} diff current: {subscription_id}, result {response}')
-                        except asyncio.TimeoutError as e:
-                            # timeout to re-connect
-                            logger.error('SubscriptionTimeout, start reSubscription')
-                            break
-                        except Exception as e:
-                            logger.error(f'exception when recv for eth_subscribe')
-                            logger.exception(e)
-                            break
+                                # TODO: reactor pass msg to another thread?
+                                etherscan_async_event_save.delay(scan_config_id, message)
+
+                                # recv_subscription_id = message_dict['params']['subscription']
+                                # if subscription_id != recv_subscription_id:
+                                #     response = await ws.send(json.dumps({"id": 2, "method": "eth_unsubscribe", "params": [recv_subscription_id]}))
+                                #     logger.warn(f'eth_unsubscribe: {recv_subscription_id} diff current: {subscription_id}, result {response}')
+                            except asyncio.TimeoutError as e:
+                                # timeout to re-connect
+                                logger.warning(f'SubscriptionTimeout for scan_config_id: {scan_config_id}, attempting to reconnect...')
+                                break
+                            except Exception as e:
+                                logger.error(f'Exception during message receiving for scan_config_id: {scan_config_id}')
+                                logger.exception(e)
+                                break
+                except Exception as e:
+                    logger.error(f"WebSocket connection failed for {ws_rpc_url}, scan_config_id: {scan_config_id}")
+                    logger.exception(e)
+                    await asyncio.sleep(backoff)
+                    backoff = min(backoff * 2, 60)
 
         def event_scan_config_to_item(eventScanConfig: EtherScanConfig) -> AsyncEventScantItem:
             return AsyncEventScantItem(
