@@ -46,6 +46,7 @@ class EtherScanConfig(models.Model):
             EtherScanConfig.objects.filter(
                 contract=self.contract,
                 scan_type=self.scan_type,
+                scan_mode=self.scan_mode,
                 status=ScanConfigStatusEnum.ENABLE
             ).update(status=ScanConfigStatusEnum.DISABLE)
         return super().save(*args, **kwargs)
