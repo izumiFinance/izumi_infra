@@ -43,12 +43,12 @@ class EtherScanConfigAdmin(admin.ModelAdmin):
             elif config.scan_type == ScanTypeEnum.Transaction:
                 scan_contract_transactions_by_config(config)
 
-    def get_readonly_fields(self, request, obj=None):
-        if obj:
-            return ['contract', 'scan_type', 'from_address_filter_list', 'to_address_filter_list',
-                    'topic_filter_list', 'function_filter_list', 'create_time', 'update_time']
-        else:
-            return ['create_time', 'update_time']
+    # def get_readonly_fields(self, request, obj=None):
+    #     if obj:
+    #         return ['contract', 'scan_type', 'from_address_filter_list', 'to_address_filter_list',
+    #                 'topic_filter_list', 'function_filter_list', 'create_time', 'update_time']
+    #     else:
+    #         return ['create_time', 'update_time']
 
 @admin.register(ContractTransactionScanTask)
 class ContractTransactionScanTaskAdmin(admin.ModelAdmin):
