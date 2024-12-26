@@ -199,7 +199,7 @@ def insert_contract_event_from_dict(scanConfigId: int, eventDataResult: str) -> 
         logger.error(f"insert_contract_event_from_dict error, scanConfigId: {scanConfigId}, {eventDataResult}")
         logger.exception(e)
 
-def insert_contract_event(scan_config: EtherScanConfig, event_extra: List[EventExtra]) -> bool:
+def insert_contract_event(scan_config: EtherScanConfig, event_extra: List[EventExtra], use_async: bool=False) -> bool:
     """
     Insert event logs scanned in blockchain event which topic is OrderCreated
     """
@@ -232,7 +232,7 @@ def insert_contract_event(scan_config: EtherScanConfig, event_extra: List[EventE
                 continue
 
             entity = ContractEvent(**event_record)
-            if not etherscan_settings.EVENT_SCAN_ENABLE_ASYNC_SIGNAL:
+            if not etherscan_settings.EVENT_SCAN_ENABLE_ASYNC_SIGNAL and not use_async:
                 mark_as_sync_entity(entity)
             entity.save()
         except IntegrityError:
