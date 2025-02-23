@@ -11,6 +11,7 @@ DEFAULTS = {
     'ADMIN_SITE_LOGIN_WHITELIST': [ip.strip() for ip in os.environ.get("IZUMI_INFRA_EXTENSIONS.ADMIN_SITE_LOGIN_WHITELIST", '').split(',') if ip.strip()],
     'ALERT_FROM_EMAIL': os.environ.get("IZUMI_INFRA_EXTENSIONS.ALERT_FROM_EMAIL", ''),
     'ENABLE_SEND_ALERT_EMAIL': os.environ.get("IZUMI_INFRA_EXTENSIONS.ENABLE_SEND_ALERT_EMAIL", False),
+    'APX_TOTAL_COUNT_BACKEND': os.environ.get("IZUMI_INFRA_ETHERSCAN.APX_TOTAL_COUNT_BACKEND", "default"),
 
     'SYSTEM_INVOKE_METHOD_LIST': (
         # modulePath.methodName

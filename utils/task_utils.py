@@ -10,6 +10,9 @@ logger = logging.getLogger(__name__)
 def is_celery_worker_mode():
     return sys.argv and sys.argv[0].endswith('celery') and 'worker' in sys.argv
 
+def is_celery_beat_mode():
+    return sys.argv and sys.argv[0].endswith('celery') and 'beat' in sys.argv
+
 
 def sequence_task(func):
     """

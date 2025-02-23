@@ -7,6 +7,7 @@ from django.db.models.sql.query import Query
 from django.core.paginator import Paginator
 from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
+from izumi_infra.extensions.conf import extensions_settings
 
 from izumi_infra.extensions.constants import CommonSettingKeyEnum, CommonSettingStatusEnum
 
@@ -48,8 +49,10 @@ class ApxTotalCountAdminPaginator(Paginator):
     @cached_property
     def count(self):
         # TODO multi db type support
-        # return TableHelper.get_mysql_table_approximate_rows(self.object_list.model)
-        return TableHelper.get_mysql_table_explain_rows(self.object_list.query)
+        if extensions_settings.APX_TOTAL_COUNT_BACKEND == 'default' or extensions_settings.APX_TOTAL_COUNT_BACKEND == 'schema_total':
+            return TableHelper.get_mysql_table_approximate_rows(self.object_list.model)
+        else:
+            return TableHelper.get_mysql_table_explain_rows(self.object_list.query)
 
 class CommonSetting(models.Model):
     id = models.BigAutoField(primary_key=True)
@@ -62,6 +65,7 @@ class CommonSetting(models.Model):
 
     status = models.SmallIntegerField("Status", default=CommonSettingStatusEnum.ENABLE.value, choices=CommonSettingStatusEnum.choices())
     value_type = models.CharField("ValueType", max_length=128)
+    # TODO type validate
 
     class Meta:
         verbose_name = _("CommonSetting")

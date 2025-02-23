@@ -67,7 +67,7 @@ def execute_filter_func_chain(data: Any, filter_list: List[Callable]) -> bool:
             is_continue = func(data)
             if not is_continue: return False
     except Exception as e:
-        logger.error(e)
+        logger.exception(e)
         return False
 
     return True

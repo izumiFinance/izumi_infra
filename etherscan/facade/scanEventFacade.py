@@ -26,6 +26,27 @@ from izumi_infra.utils.db_utils import DjangoDbConnSafeThreadPoolExecutor
 logger = logging.getLogger(__name__)
 
 
+def fetch_all_contract_event_chain(exclude_chains=[]) -> set:
+    event_scan_config_list = EtherScanConfig.objects.select_related("contract__chain").filter(
+        scan_type=ScanTypeEnum.Event,
+        status=ScanConfigStatusEnum.ENABLE,
+    ).exclude(contract__chain_id__in=exclude_chains).all()
+
+    return set([scan_config.contract.chain.chain_id for scan_config in event_scan_config_list])
+
+def scan_contract_event_by_chain(chain_id: int) -> None:
+    """
+    Entry for start async task for event info sync from blockchain by chain dimension.
+    """
+    event_scan_config_list = EtherScanConfig.objects.select_related("contract__chain").filter(
+        scan_type=ScanTypeEnum.Event,
+        status=ScanConfigStatusEnum.ENABLE,
+    ).all()
+
+    event_scan_config_group = get_sorted_chain_group_config(event_scan_config_list)
+    scan_contract_event_group(event_scan_config_group.popitem()[1])
+
+
 def scan_all_contract_event(exclude_chains=[]) -> None:
     """
     Entry for the event info sync from blockchain.

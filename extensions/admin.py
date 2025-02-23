@@ -80,7 +80,7 @@ class SystemInvokeAdmin(NonModelAdmin):
                 else:
                     errors.append(f'no match target for: {method}, conf: {method_list}')
             except Exception as e:
-                logger.error(e)
+                logger.exception(e)
                 errors.append(str(e))
 
         if not invoke_result: invoke_result = 'Success invoke'
