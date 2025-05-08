@@ -58,7 +58,9 @@ class EtherScanConfig(models.Model):
     class Meta:
         verbose_name = _("EtherScanConfig")
         verbose_name_plural = _("EtherScanConfigs")
-        index_together = [['scan_type', 'status']]
+        indexes = [
+            models.Index(fields=['scan_type', 'status']),
+        ]
 
     def __str__(self):
         return f'EthScanCfg-{ScanTypeEnum(self.scan_type).name}-{self.id}-{getattr(self.contract, "type", "None")}'
@@ -111,9 +113,9 @@ class ContractEventScanTask(models.Model):
     class Meta:
         verbose_name = _("ContractEventScanTask")
         verbose_name_plural = _("ContractEventScanTasks")
-        index_together = [
-            ['contract', 'status'],
-            ['contract', 'end_block_id'],
+        indexes = [
+            models.Index(fields=['contract', 'status']),
+            models.Index(fields=['contract', 'end_block_id']),
         ]
 
     def __str__(self):
@@ -165,9 +167,9 @@ class ContractTransaction(models.Model):
     class Meta:
         verbose_name = _("ContractTransaction")
         verbose_name_plural = _("ContractTransaction")
-        index_together = [
-            ['contract', 'function_name', 'status'],
-            ['status', 'touch_count_remain', 'create_time']
+        indexes = [
+            models.Index(fields=['contract', 'function_name', 'status']),
+            models.Index(fields=['status', 'touch_count_remain', 'create_time']),
         ]
         unique_together = [['transaction_hash', 'function_name']]
 
@@ -222,9 +224,9 @@ class ContractEvent(models.Model):
     class Meta:
         verbose_name = _("ContractEvent")
         verbose_name_plural = _("ContractEvent")
-        index_together = [
-            ['contract', 'topic', 'status'],
-            ['status', 'touch_count_remain', 'create_time']
+        indexes = [
+            models.Index(fields=['contract', 'topic', 'status']),
+            models.Index(fields=['status', 'touch_count_remain', 'create_time']),
         ]
         unique_together = [['transaction_hash', 'log_index']]
 
