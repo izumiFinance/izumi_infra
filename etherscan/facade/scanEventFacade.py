@@ -39,6 +39,7 @@ def scan_contract_event_by_chain(chain_id: int) -> None:
     Entry for start async task for event info sync from blockchain by chain dimension.
     """
     event_scan_config_list = EtherScanConfig.objects.select_related("contract__chain").filter(
+        chain_id=chain_id,
         scan_type=ScanTypeEnum.Event,
         status=ScanConfigStatusEnum.ENABLE,
     ).all()
