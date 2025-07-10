@@ -4,6 +4,9 @@ import sys
 from functools import wraps
 from celery.app.control import Control
 from celery_once import QueueOnce, AlreadyQueued
+from celery import current_task
+
+from izumi_infra.utils.cache_util import FAIL_BACK_RENEWAL_MANAGER, RenewalManager
 
 logger = logging.getLogger(__name__)
 
@@ -63,3 +66,21 @@ class IzumiQueueOnce(QueueOnce):
             if log_critical:
                 logger.critical(f'IzumiQueueOnce base task: {self.name} is not finished yet, try run another instance')
             raise e
+
+    def __call__(self, *args, **kwargs):
+        key = self.get_key(args, kwargs)
+        # TODO use IzumiQueueOnce TTL and enable params
+        self.request.lock_renewal = RenewalManager(
+            key=key,
+            redis_instance=QueueOnce().once_backend.redis,
+            initial_ttl=20 * 60
+        )
+
+        return super().__call__(*args, **kwargs)
+
+def current_task_lock_renewal() -> RenewalManager:
+    try:
+        return current_task.request.lock_renewal
+    except Exception as e:
+        logger.exception(e)
+        return FAIL_BACK_RENEWAL_MANAGER

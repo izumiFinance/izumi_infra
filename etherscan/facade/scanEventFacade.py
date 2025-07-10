@@ -22,6 +22,7 @@ from izumi_infra.etherscan.types import EventExtra, EventExtraData
 from izumi_infra.etherscan.utils import execute_filter_func_chain, mark_as_sync_entity
 from izumi_infra.utils.collection_utils import chunks
 from izumi_infra.utils.db_utils import DjangoDbConnSafeThreadPoolExecutor
+from izumi_infra.utils.task_utils import current_task_lock_renewal
 
 logger = logging.getLogger(__name__)
 
@@ -134,9 +135,12 @@ def scan_contract_event_by_config(event_scan_config: EtherScanConfig):
         status=ScanTaskStatusEnum.INITIAL
     )
 
+    lock_renewal = current_task_lock_renewal()
+
     for task in unfinished_tasks:
         try:
             execute_unfinished_event_scan_task(task)
+            lock_renewal.renew()
         except Exception as e:
             logger.error(f"execute_unfinished_event_scan_task error, task: {task}")
             logger.exception(e)
